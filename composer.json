@@ -10,9 +10,13 @@
     },
     "authors": [
         {
+            "name": "Andrii Podanenko",
+            "email": "podarok@gmail.com"
+        },
+        {
             "name": "Anatolii Poliakov",
-            "email": "anatoliy@imagexmedia.com"
-        }
+            "email": "anpolimus@gmail.com"
+        },
     ],
     "minimum-stability": "dev",
     "require": {}
