@@ -17,6 +17,10 @@
             "name": "Anatolii Poliakov",
             "email": "anpolimus@gmail.com"
         },
+        {
+            "name": "Max Kuzmych",
+            "email": "max.kuzmych@fivejars.com"
+        }
     ],
     "minimum-stability": "dev",
     "require": {}
