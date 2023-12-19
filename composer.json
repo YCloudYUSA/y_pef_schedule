@@ -1,0 +1,19 @@
+{
+    "name": "ycloudyusa/y_pef_schedule",
+    "description": "Additional admin tools to manage Y-USA PEF Sessions",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "autoload": {
+        "psr-4": {
+            "Ycloudyusa\\YPefSchedule\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anatolii Poliakov",
+            "email": "anatoliy@imagexmedia.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
