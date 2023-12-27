@@ -20,6 +20,10 @@
         {
             "name": "Max Kuzmych",
             "email": "max.kuzmych@fivejars.com"
+        },
+        {
+            "name": "Roman Salo",
+            "email": "roman.salo@fivejars.com"
         }
     ],
     "minimum-stability": "dev",

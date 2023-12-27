@@ -1,0 +1,18 @@
+y_pef_schedule.fullcalendar:
+  path: '/mypage/page'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::myPage'
+    _title: 'My first page in D8'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.schedules_ajax_date_range:
+  path: '/schedules/get-event-data-date-range/{location}/{start}/{end}/{categories}'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\RepeatScheduleController::ajaxSchedulerByDateRange'
+    location: ''
+    start: '0'
+    end: '0'
+    categories: []
+  requirements:
+    _permission: 'access content'
