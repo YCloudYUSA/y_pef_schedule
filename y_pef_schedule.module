@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function y_pef_schedule_preprocess_page(&$variables): void {
+  $variables['#attached']['library'][] = 'y_pef_schedule/y_pef_schedule-app';
+}
