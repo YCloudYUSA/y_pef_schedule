@@ -52,3 +52,7 @@ Axios
 FullCalendar
 vue2-timepicker
 vuejs-datepicker
+
+
+bootstrap-vue - not supported for vue3, @vue/compat - aka migration build not the best solution, it requires bootstrap 4
+

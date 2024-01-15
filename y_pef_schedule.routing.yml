@@ -1,8 +1,35 @@
-y_pef_schedule.fullcalendar:
-  path: '/mypage/page'
+y_pef_schedule.branches:
+  path: '/admin/openy/schedules'
   defaults:
-    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::myPage'
-    _title: 'My first page in D8'
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branches'
+    _title: 'Schedules'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.create_event:
+  path: '/admin/openy/schedules/create-event'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::createEvent'
+    _title: 'Create event'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.update_event:
+  path: '/admin/openy/schedules/update-event'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::updateEvent'
+    _title: 'Update event'
+  requirements:
+    _permission: 'access content'
+
+
+y_pef_schedule.fullcalendar:
+  path: '/admin/openy/schedules/{branch}/{start_date}'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::calendarView'
+    _title: 'Schedules'
+    branch: ''
+    start_date: '0'
   requirements:
     _permission: 'access content'
 

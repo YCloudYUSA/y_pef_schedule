@@ -1,0 +1,9 @@
+<ul>
+  {% for value in branches %}
+    <li>
+      <a href="{{ path('y_pef_schedule.fullcalendar', {'branch': value}) }}">{{ value }}</a>
+    </li>
+    {#  {{ link(value,  path('y_pef_schedule.fullcalendar', {'branch': value}), {}) }}<br>#}
+  {% endfor %}
+</ul>
+

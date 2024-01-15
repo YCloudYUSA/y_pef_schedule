@@ -1,12 +1,26 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
+// import HomePage from './components/HomePage.vue';
 
+import ClickOutsideDirective from './clickOutsideDirective';
+import GlobalMixins from './mixins/globalMixins';
 
-import axios from 'axios'
-import VueAxios from 'vue-axios'
+const routes = [
+  // { path: '/', component: HomePage },
+];
 
-const app = createApp(App)
-// app.use(VueAxios, axios)
+const router = createRouter({
+  history: createWebHistory(),
+  routes: routes
+});
 
-app.mount('#fullcalendar-app')
+const app = createApp(App);
+
+app.directive('click-outside', ClickOutsideDirective);
+app.mixin(GlobalMixins);
+
+app.use(router);
+
+app.mount('#fullcalendar-app');
