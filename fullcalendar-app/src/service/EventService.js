@@ -1,40 +1,42 @@
 import axios from 'axios';
-import moment from "moment/moment";
-
+import { getTime } from 'date-fns'; // Importing formatISO to handle dates
+import { API_BASE_URL, SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig'; // Importing config
 
 export default class EventService {
 
-  getEvents(start, end, categories = []) {
+  async getEvents(start, end, categories = []) {
     if (start === end) {
-      return Promise.resolve([]);
+      return [];
     }
 
+    // Convert start and end dates to ISO strings which are effectively timestamps
+    const formattedStart = Math.floor(getTime(start) / 1000); // переводимо мілісекунди в секунди
+    const formattedEnd = Math.floor(getTime(end) / 1000); // переводимо мілісекунди в секунди
 
     const categoryParams = categories.length > 0 ? '/' + categories.join(',') : '';
-    const url = 'http://yusaopeny.docksal.site/schedules/get-event-data-date-range/'+ this.getBranch() +'/' + moment(start).unix() + '/' + moment(end).unix() + categoryParams;
+    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${this.getBranch()}/${formattedStart}/${formattedEnd}${categoryParams}`;
 
-    return axios.get(url)
-      .then(res => {
-
-        console.log('res data from event service', res.data);
-
-        return res.data.map(event => ({
-          id: event.nid,
-          title: event.name,
-          start: event.time_start_calendar,
-          end: event.time_end_calendar,
-        }));
-      });
+    try {
+      const response = await axios.get(url);
+      return response.data.map(event => ({
+        id: event.nid,
+        title: event.name,
+        start: event.time_start_calendar,
+        end: event.time_end_calendar,
+      }));
+    } catch (error) {
+      // Implement better error handling, e.g., showing error messages to the user
+      throw new Error('Failed to fetch events.');
+    }
   }
 
   getBranch() {
-    return window.drupalSettings.path?.branch;
+    return window.drupalSettings?.path?.branch || null;
   }
 
   async updateEventOnServer(eventData) {
     try {
-      console.log('Updating event on the server ...');
-      const response = await axios.post('/admin/openy/schedules/update-event', eventData);
+      const response = await axios.post(`${API_BASE_URL}${UPDATE_EVENT_ENDPOINT}`, eventData);
 
       // If the request is successful, get the event id from the response
       if (response.status === 200) {
@@ -47,10 +49,10 @@ export default class EventService {
         // this.showModal = false;
         // Show a success message
         // alert('Event saved successfully!');
+        return response.data; // Returning the response data for further handling
       }
     } catch (error) {
-      console.error('Error during update:', error);
-      // Обробка помилок
+      throw new Error('Failed to update the event.');
     }
   }
 }

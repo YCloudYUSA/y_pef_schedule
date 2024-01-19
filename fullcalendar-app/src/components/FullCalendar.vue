@@ -1,20 +1,14 @@
 <template>
   <div>
-    <div class="fullcalendar--header">
-      <div class="pdf">
-        <button @click="downloadPDF">Download PDF</button>
-      </div>
-
-      <div class="checkbox-container">
-        <div v-for="category in categories" :key="category" class="checkbox-item">
-          <input type="checkbox" :value="category" v-model="selectedCategories" @change="handleCategoryChange" />
-          <label>{{ category }}</label>
-        </div>
-      </div>
-    </div>
+    <CalendarHeader
+      :categories="categories"
+      :selectedCategories="selectedCategories"
+      @downloadPDF="downloadPDF"
+      @categoryChange="handleCategoryChange"
+    />
 
     <FullCalendar ref="fullCalendar" :options="calendarOptions">
-      <template v-slot:eventContent='arg'>
+      <template v-slot:eventContent="arg">
         <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
       </template>
@@ -22,27 +16,24 @@
 
     <EventPopup v-if="activeModal === 'eventPopup'" :initialEvent="selectedEvent" @close="closePopup" @save="addEvent" />
     <EventPopover v-if="activeModal === 'eventPopover'" :event="selectedEvent" :style="popoverStyle" @close="closePopup" @edit="handleEdit" />
-<!--    <event-popup v-if="showEditPopup" :initialEvent="selectedEvent" @close="closePopup" @save="selectedEvent.id ? updateEvent : addEvent" />-->
-
   </div>
 </template>
 
 <script>
 
-// import the third-party stylesheets directly from your JS
 import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // needs additional webpack config!
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
+import CalendarHeader from './CalendarHeader.vue';
 import FullCalendar from '@fullcalendar/vue3';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import EventPopup from './EventPopup.vue';
 import EventPopover from './EventPopover.vue';
-
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
-
-
 import EventService from '../service/EventService';
+import { formatDateTimeLocal, updateUrlParams } from '@/utils/dateUtils';
+
 
 export default {
   name: 'EventsFullCalendar',
@@ -50,13 +41,12 @@ export default {
     FullCalendar,
     EventPopup,
     EventPopover,
+    CalendarHeader,
   },
   data() {
     return {
-      activeModal: null, // 'eventPopup', 'eventEditPopup', 'eventPopover'
-
+      activeModal: null,
       popoverStyle: {},
-
       selectedEvent: null,
       selectedCategories: [],
       categories: [
@@ -76,13 +66,8 @@ export default {
         initialView: 'timeGridWeek',
         editable: true,
         selectable: true,
-        selectAllow: function(selectInfo) {
-          const start = selectInfo.start;
-          const end = selectInfo.end;
-          // Перевірка, що кінець вибору є тим же днем (не включає наступний день)
-          return start.toISOString().substring(0, 10) === end.toISOString().substring(0, 10);
-        },
-        // selectMirror: true,
+        selectAllow: this.checkSameDaySelection,
+        selectMirror: false,
         weekends: true,
         dayMaxEvents: false,
         events: null,
@@ -90,72 +75,80 @@ export default {
         datesSet: this.handleWeekChange,
         select: this.handleSelect,
         eventClick: this.handleEventClick,
-        eventDrop: this.handleEventDrop,
-        eventResize: this.handleEventResize,
+        eventDrop: this.updateEvent,
+        eventResize: this.updateEvent,
       }
     };
   },
-  eventService: null,
-  created() {
-    this.eventService = new EventService();
-  },
+  created() { this.eventService = new EventService(); },
   mounted() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const start = urlParams.get('start');
-    const end = urlParams.get('end');
-
-    if (start && end) {
-      this.loadEvents(start, end);
+    const { start, end } = this.getInitialDateParams();
+    start && end ? this.loadEvents(start, end) : this.loadEvents();
+    console.log('start', start);
+    if (start) {
       this.setInitialDate(start);
-    } else {
-      // Якщо параметри 'start' та 'end' не знайдені, використовуйте поточний тиждень
-      // або будь-яку іншу логіку для визначення початкових дат
-      this.loadEvents(); // Завантаження подій для поточного тижня або дефолтних дат
     }
   },
   methods: {
-    openPopup(type) {
-      this.activeModal = type;
-    },
-    closePopup() {
-      this.activeModal = null;
-    },
+    downloadPDF() { /* PDF download logic */ },
+    openPopup(type) { this.activeModal = type; },
+    closePopup() { this.activeModal = null; },
     handleSelect(selectInfo) {
-      console.log('handleSelect called');
-
-      // Логіка для обробки вибору дати
       this.selectedEvent = {
         start: selectInfo.startStr,
         end: selectInfo.endStr
-        // Додайте інші необхідні вам поля
       };
 
       this.openPopup('eventPopup')
     },
-    setInitialDate(startDate) {
-      // Логіка для встановлення початкової дати календаря
-      // Ви можете використовувати API вашого календаря для зміни поточного перегляду
+    handleEdit(event) { /* Edit logic */ },
+    addEvent(newEvent) {
+      this.addEventToCalendar(newEvent);
+      this.closePopup()
+    },
+    addEventToCalendar(newEvent) {
       const calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.gotoDate(startDate);
+      calendarApi.addEvent(newEvent);
     },
-    formatDateTimeLocal(date) {
-      return date.toISOString().slice(0, 19); // Обрізаємо частину про часовий пояс
+    async handleWeekChange(payload) {
+      console.log(payload);
+      const { startStr, endStr } = payload;
+      await this.loadEvents(startStr, endStr)
+
+      updateUrlParams(startStr, endStr);
     },
-    handleEventDrop(dropInfo) {
-      let event = {
-        id: dropInfo.event.id,
-        start: this.formatDateTimeLocal(dropInfo.event.start),
-        end: this.formatDateTimeLocal(dropInfo.event.end),
-      };
-      this.eventService.updateEventOnServer(event)
+    handleCategoryChange() {
+      const calendarApi = this.$refs.fullCalendar.getApi();
+      const start = calendarApi.view.activeStart.toISOString();
+      const end = calendarApi.view.activeEnd.toISOString();
+
+      this.loadEvents(start, end);
     },
-    handleEventResize(resizeInfo) {
-      let event = {
-        id: resizeInfo.event.id,
-        start: this.formatDateTimeLocal(resizeInfo.event.start),
-        end: this.formatDateTimeLocal(resizeInfo.event.end),
+    async loadEvents(start, end) {
+      this.eventService.getEvents(start, end, this.selectedCategories)
+        .then(data => this.calendarOptions.events = data);
+    },
+    checkSameDaySelection(selectInfo) {
+      const start = selectInfo.start;
+      const end = selectInfo.end;
+      // Перевірка, що кінець вибору є тим же днем (не включає наступний день)
+      return start.toISOString().substring(0, 10) === end.toISOString().substring(0, 10);
+    },
+    updateEvent(eventInfo) {
+      const event = {
+        id: eventInfo.event.id,
+        start: formatDateTimeLocal(eventInfo.event.start),
+        end: formatDateTimeLocal(eventInfo.event.end),
       };
       this.eventService.updateEventOnServer(event);
+    },
+    getInitialDateParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      return {
+        start: urlParams.get('start'),
+        end: urlParams.get('end')
+      };
     },
     handleEventClick(clickInfo) {
       this.popoverStyle = {
@@ -173,75 +166,12 @@ export default {
 
       this.openPopup('eventPopover')
     },
-    handleEdit(event) {
-      console.log(event);
-      // Логіка для редагування події
-      // Може включати відкриття форми для редагування
-    },
-    addEventToCalendar(newEvent) {
-      // Припускаємо, що newEvent містить необхідні поля для FullCalendar
+    setInitialDate(startDate) {
+      // Логіка для встановлення початкової дати календаря
+      // Ви можете використовувати API вашого календаря для зміни поточного перегляду
       const calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.addEvent(newEvent);
-    },
-    addEvent(newEvent) {
-      this.addEventToCalendar(newEvent);
-      this.closePopup()
-    },
-    async handleWeekChange(payload) {
-      const start = payload.startStr;
-      const end = payload.endStr;
-
-      await this.loadEvents(start, end)
-
-      // Отримання поточного URL з браузера
-      const currentUrl = window.location.href;
-
-      // Створення URL-об'єкту для легкого маніпулювання параметрами запиту
-      const url = new URL(currentUrl);
-
-      // Встановлення або оновлення параметрів 'start' та 'end'
-      url.searchParams.set('start', start);
-      url.searchParams.set('end', end);
-
-      // Заміна поточного URL без перезавантаження сторінки
-      window.history.replaceState({}, '', url.toString());
-
-      console.log(this.$route);
-      // this.$router.replace({ path: this.$route.path, query: { start, end } });
-    },
-    handleCategoryChange() {
-      const calendarApi = this.$refs.fullCalendar.getApi();
-
-      const start = calendarApi.view.activeStart.toISOString();
-      const end = calendarApi.view.activeEnd.toISOString();
-
-      this.loadEvents(start, end);
-    },
-    async loadEvents(start, end) {
-      this.eventService.getEvents(start, end, this.selectedCategories).then(data => this.calendarOptions.events = data);
+      calendarApi.gotoDate(startDate);
     },
   }
 };
 </script>
-
-<style>
-.fullcalendar--header {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 30px 0;
-}
-
-.checkbox-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.checkbox-item {
-  margin-right: 15px;
-}
-
-.checkbox-item input[type="checkbox"]:checked {
-  color: green;
-}
-</style>

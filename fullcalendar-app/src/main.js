@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // import HomePage from './components/HomePage.vue';
 
-import ClickOutsideDirective from './clickOutsideDirective';
+import ClickOutsideDirective from './directives/clickOutsideDirective';
 import GlobalMixins from './mixins/globalMixins';
 
 const routes = [
