@@ -1,7 +1,23 @@
 y_pef_schedule.branches:
   path: '/admin/openy/schedules'
   defaults:
-    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branches'
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branchesListPage'
+    _title: 'Schedules'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.branches_options:
+  path: '/branches-options'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getBranchesOptions'
+    _title: 'Schedules'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.classes_options:
+  path: '/classes-options'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getClassesOptions'
     _title: 'Schedules'
   requirements:
     _permission: 'access content'

@@ -1,10 +1,11 @@
 export default {
   beforeMount(el, binding) {
     el.clickOutsideEvent = function(event) {
-      // Перевіряємо, чи клік був на елементі календаря
+      // We check whether the click was on the calendar element
       const calendarEventClicked = event.target.closest('.fc-timegrid-event-harness-inset');
 
-      // Якщо клік поза елементом, метод переданий, і клік не на календарному івенті
+      // If the click is outside the element, the method is passed and the
+      // click is not on the calendar event.
       if (!(el.contains(event.target)) && binding.value && !calendarEventClicked) {
         console.log("click outside event triggered");
 

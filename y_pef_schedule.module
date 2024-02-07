@@ -26,12 +26,3 @@ function y_pef_schedule_theme(): array {
     ],
   ];
 }
-
-/**
- * Implements hook_library_info_alter().
- */
-function y_pef_schedule_library_info_alter(&$libraries, $extension): void {
-  if (\Drupal::routeMatch()->getRouteName() === 'y_pef_schedule.fullcalendar' && $extension === 'claro') {
-    unset($libraries['global-styling']['css']['component']['css/components/tables.css']);
-  }
-}

@@ -26,10 +26,26 @@ export default {
   },
   methods: {
     isSelected(category) {
-      return this.selectedCategories.includes(category);
+      // Make sure selectedCategories is an array before calling includes
+      if (Array.isArray(this.selectedCategories)) {
+        return this.selectedCategories.includes(category);
+      }
+      console.error('selectedCategories is not an array:', this.selectedCategories);
+      return false;
     },
     emitCategoryChange(category, isChecked) {
-      this.$emit('categoryChange', { category, isChecked });
+      // Create a new array that reflects the change
+      let updatedCategories = isChecked
+        // Add the category
+        ? [...this.selectedCategories, category]
+        // Remove the category
+        : this.selectedCategories.filter(cat => cat !== category);
+
+      // Make sure there are no duplicates
+      updatedCategories = Array.from(new Set(updatedCategories));
+
+      // Emit the updated array of selected categories
+      this.$emit('categoryChange', updatedCategories);
     }
   }
 };

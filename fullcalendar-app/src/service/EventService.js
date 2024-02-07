@@ -10,11 +10,12 @@ export default class EventService {
     }
 
     // Convert start and end dates to ISO strings which are effectively timestamps
-    const formattedStart = Math.floor(getTime(start) / 1000); // переводимо мілісекунди в секунди
-    const formattedEnd = Math.floor(getTime(end) / 1000); // переводимо мілісекунди в секунди
+    const formattedStart = Math.floor(getTime(start) / 1000);
+    const formattedEnd = Math.floor(getTime(end) / 1000);
 
+    const branch = encodeURIComponent(this.getBranch());
     const categoryParams = categories.length > 0 ? '/' + categories.join(',') : '';
-    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${this.getBranch()}/${formattedStart}/${formattedEnd}${categoryParams}`;
+    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${branch}/${formattedStart}/${formattedEnd}${categoryParams}`;
 
     try {
       const response = await axios.get(url);
@@ -40,16 +41,9 @@ export default class EventService {
 
       // If the request is successful, get the event id from the response
       if (response.status === 200) {
-        // const eventId = response.data.id;
-        // // Add the event id to the event object
-        // event.id = eventId;
-        // // Add the event to the FullCalendar instance
-        // this.$refs.fullCalendar.getApi().addEvent(event);
-        // // Close the modal window
-        // this.showModal = false;
         // Show a success message
         // alert('Event saved successfully!');
-        return response.data; // Returning the response data for further handling
+        return response.data;
       }
     } catch (error) {
       throw new Error('Failed to update the event.');

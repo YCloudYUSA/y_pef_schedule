@@ -14,8 +14,20 @@
       </template>
     </FullCalendar>
 
-    <EventPopup v-if="activeModal === 'eventPopup'" :initialEvent="selectedEvent" @close="closePopup" @save="addEvent" />
-    <EventPopover v-if="activeModal === 'eventPopover'" :event="selectedEvent" :style="popoverStyle" @close="closePopup" @edit="handleEdit" />
+    <EventPopup
+      v-if="activeModal === 'eventPopup'"
+      :initialEvent="selectedEvent"
+      @close="closePopup"
+      @save="handleEventSaveOrUpdate"
+    />
+
+    <EventPopover
+      v-if="activeModal === 'eventPopover'"
+      :event="selectedEvent"
+      :style="popoverStyle"
+      @close="closePopup"
+      @edit-event="handleEditEvent"
+    />
   </div>
 </template>
 
@@ -56,7 +68,11 @@ export default {
         "Swim Lessons - Preschool"
       ],
       calendarOptions: {
-        plugins: [interactionPlugin, timeGridPlugin, bootstrap5Plugin],
+        plugins: [
+          interactionPlugin,
+          timeGridPlugin,
+          bootstrap5Plugin
+        ],
         themeSystem : "bootstrap5",
         headerToolbar: {
           left: 'prev, next, today',
@@ -84,7 +100,7 @@ export default {
   mounted() {
     const { start, end } = this.getInitialDateParams();
     start && end ? this.loadEvents(start, end) : this.loadEvents();
-    console.log('start', start);
+
     if (start) {
       this.setInitialDate(start);
     }
@@ -101,7 +117,30 @@ export default {
 
       this.openPopup('eventPopup')
     },
-    handleEdit(event) { /* Edit logic */ },
+    handleEditEvent(event) {
+      this.selectedEvent = { ...event };
+      this.openPopup('eventPopup');
+    },
+    handleEventSaveOrUpdate(eventData) {
+      if (eventData.id) {
+        this.updateEventOnCalendar(eventData);
+      } else {
+        this.addEventToCalendar(eventData);
+      }
+      this.closePopup();
+    },
+    updateEventOnCalendar(updatedEvent) {
+      const calendarApi = this.$refs.fullCalendar.getApi();
+      let calendarEvent = calendarApi.getEventById(updatedEvent.id);
+
+      if (calendarEvent) {
+        calendarEvent.setProp('title', updatedEvent.title);
+        calendarEvent.setStart(updatedEvent.start);
+        calendarEvent.setEnd(updatedEvent.end);
+      }
+
+      // this.eventService.updateEventOnServer(updatedEvent);
+    },
     addEvent(newEvent) {
       this.addEventToCalendar(newEvent);
       this.closePopup()
@@ -111,17 +150,17 @@ export default {
       calendarApi.addEvent(newEvent);
     },
     async handleWeekChange(payload) {
-      console.log(payload);
       const { startStr, endStr } = payload;
       await this.loadEvents(startStr, endStr)
 
-      updateUrlParams(startStr, endStr);
+      updateUrlParams(startStr);
     },
-    handleCategoryChange() {
+    handleCategoryChange(categories) {
       const calendarApi = this.$refs.fullCalendar.getApi();
       const start = calendarApi.view.activeStart.toISOString();
       const end = calendarApi.view.activeEnd.toISOString();
 
+      this.selectedCategories = categories
       this.loadEvents(start, end);
     },
     async loadEvents(start, end) {
@@ -131,7 +170,7 @@ export default {
     checkSameDaySelection(selectInfo) {
       const start = selectInfo.start;
       const end = selectInfo.end;
-      // Перевірка, що кінець вибору є тим же днем (не включає наступний день)
+      // Checking that the end of the selection is the same day (does not include the next day).
       return start.toISOString().substring(0, 10) === end.toISOString().substring(0, 10);
     },
     updateEvent(eventInfo) {
@@ -140,7 +179,7 @@ export default {
         start: formatDateTimeLocal(eventInfo.event.start),
         end: formatDateTimeLocal(eventInfo.event.end),
       };
-      this.eventService.updateEventOnServer(event);
+      // this.eventService.updateEventOnServer(event);
     },
     getInitialDateParams() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -151,9 +190,33 @@ export default {
       };
     },
     handleEventClick(clickInfo) {
+      // Approximate width of the popover.
+      const popoverWidth = 300;
+      // Approximate height of the popover.
+      const popoverHeight = 200;
+      // Minimum space between the popover and the edge of the window.
+      const windowPadding = 10;
+
+      let top = clickInfo.jsEvent.clientY;
+      let left = clickInfo.jsEvent.clientX;
+
+      // Adjust for the bottom edge of the window.
+      if (window.innerHeight - top < popoverHeight + windowPadding) {
+        top -= popoverHeight;
+      }
+
+      // Adjust for the right edge of the window.
+      if (window.innerWidth - left < popoverWidth + windowPadding) {
+        left -= popoverWidth;
+      }
+
+      // Prevent popover from going off the top or left edge of the screen.
+      top = Math.max(windowPadding, top);
+      left = Math.max(windowPadding, left);
+
       this.popoverStyle = {
-        top: clickInfo.jsEvent.clientY + 'px',
-        left: clickInfo.jsEvent.clientX + 'px'
+        top: `${top}px`,
+        left: `${left}px`
       };
 
       this.selectedEvent = {
@@ -161,14 +224,13 @@ export default {
         title: clickInfo.event.title,
         start: clickInfo.event.start,
         end: clickInfo.event.end,
-        // Інші поля, якщо потрібно
+        // ... other fields.
       };
 
-      this.openPopup('eventPopover')
+      this.openPopup('eventPopover');
     },
     setInitialDate(startDate) {
-      // Логіка для встановлення початкової дати календаря
-      // Ви можете використовувати API вашого календаря для зміни поточного перегляду
+      // Logic to set the start date of the calendar.
       const calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.gotoDate(startDate);
     },

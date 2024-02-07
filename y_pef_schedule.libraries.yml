@@ -3,9 +3,9 @@ y_pef_schedule-app:
   version: 1.0
   js:
     fullcalendar-app/dist/fullcalendar-app.umd.min.js: { minified: true }
-#  css:
-#    theme:
-#      fullcalendar-app/dist/fullcalendar-app.css: { minified: true }
+  css:
+    theme:
+      assets/css/custom-calendar-styles.css: {}
   dependencies:
     - y_pef_schedule/vue3
     - y_pef_schedule/vue3.vuex

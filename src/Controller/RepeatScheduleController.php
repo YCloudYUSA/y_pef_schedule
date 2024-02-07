@@ -1,7 +1,5 @@
 <?php
 
-//declare(strict_types = 1);
-
 namespace Drupal\y_pef_schedule\Controller;
 
 use Drupal\Component\Utility\UrlHelper;

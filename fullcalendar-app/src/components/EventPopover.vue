@@ -29,7 +29,7 @@ export default {
       return new Date(date).toLocaleString();
     },
     editEvent() {
-      this.$emit('edit', this.event);
+      this.$emit('edit-event', this.event);
     }
   }
 };
@@ -40,7 +40,7 @@ export default {
   position: absolute;
   z-index: 100;
   width: auto;
-  max-width: 600px; /* або ширина, яка вам потрібна */
+  max-width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -53,7 +53,6 @@ export default {
   justify-content: space-between;
 }
 
-/* Bootstrap 4 не має класу .card-footer за замовчуванням, тому додаємо власні стилі, якщо потрібно */
 .card-footer {
   padding: 0.75rem 1.25rem;
   background-color: #f8f9fa;
@@ -63,6 +62,4 @@ export default {
 .event-popover .card-title {
   padding-right: 10px;
 }
-
-/* Додаткові стилі, якщо потрібно */
 </style>

@@ -1,0 +1,4 @@
+tr,
+.draggable-table.tabledrag-disabled tr {
+  background: none !important;
+}
