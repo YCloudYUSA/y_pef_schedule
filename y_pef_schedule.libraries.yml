@@ -12,6 +12,11 @@ y_pef_schedule-app:
     - y_pef_schedule/axios
     - openy_carnation/global-styling
 
+branches-list:
+  css:
+    theme:
+      assets/css/branches-list.css: { }
+
 # TODO: Not used libraries should be removed.
 # TODO: Move to separate extension.
 # Vue 2

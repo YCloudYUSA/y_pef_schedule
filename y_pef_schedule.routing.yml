@@ -2,7 +2,7 @@ y_pef_schedule.branches:
   path: '/admin/openy/schedules'
   defaults:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branchesListPage'
-    _title: 'Schedules'
+    _title: 'Branches'
   requirements:
     _permission: 'access content'
 
