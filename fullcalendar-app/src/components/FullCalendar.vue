@@ -46,6 +46,7 @@ import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import EventService from '../service/EventService';
 import { formatDateTimeLocal, updateUrlParams } from '@/utils/dateUtils';
 import axios from 'axios';
+import html2pdf from 'html2pdf.js'
 
 
 export default {
@@ -64,12 +65,6 @@ export default {
       selectedCategories: [],
       initializationCompleted: false, // Додано нову змінну стану
       categories: [],
-      // categories: [
-      //   { name: 'Academic Enrichment - Youth', color: '#FFD700'},
-      //   { name: 'Swim Lessons - Youth', color: '#FF8C00'},
-      //   { name: 'Birthday Parties', color: '#FFD700'},
-      //   { name: 'Swim Lessons - Preschool', color: '#FFD700'},
-      // ],
       calendarOptions: {
         plugins: [
           interactionPlugin,
@@ -123,7 +118,50 @@ export default {
     }
   },
   methods: {
-    downloadPDF() { /* PDF download logic */ },
+    downloadPDF() {
+      // We are forced to clone the calendar in order to modify its elements
+      // before transferring to the PDF, otherwise, the user will see changes
+      // on the page when the PDF is loaded.
+      const element = document.getElementById('fullcalendar-app'); // The original element of the calendar.
+      const clone = element.cloneNode(true); // Create a deep copy of an element
+
+      // Get the text from the calendar header.
+      const scheduleTitle = document.querySelector('.fc-toolbar-title').textContent;
+      const fileName = `Weekly schedule (${scheduleTitle}).pdf`;
+
+      // Setting styles for copy.
+      clone.style.padding = '0';
+      clone.style.margin = '0';
+      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar').forEach(function(element) {
+        element.style.display = 'none';
+      });
+
+      // Adding copy to the DOM for PDF generation. The copy will be deleted immediately, so the user will not see the change.
+      document.body.appendChild(clone);
+
+      // Setting parameters for html2pdf.
+      const options = {
+        margin: [5, 5],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a3',
+          orientation: 'landscape',
+          compressPDF: true
+        }
+      };
+
+      // Generate PDF from copy.
+      html2pdf().from(clone).set(options).toPdf().get('pdf').then(function (pdf) {
+        document.body.removeChild(clone); // Removing a copy from the DOM after creating a PDF.
+        pdf.save(options.filename);
+      }).catch(function(error) {
+        console.error('Помилка при створенні PDF:', error);
+        document.body.removeChild(clone); // Make sure the copy is deleted even in case of error.
+      });
+    },
     openPopup(type) { this.activeModal = type; },
     closePopup() { this.activeModal = null; },
     handleSelect(selectInfo) {
@@ -269,7 +307,6 @@ export default {
     loadCategories() {
       axios.get('/schedules-categories')
         .then(response => {
-          console.log('data', response.data);
           this.categories = response.data
         })
         .catch(error => {

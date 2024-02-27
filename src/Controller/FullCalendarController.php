@@ -234,6 +234,7 @@ class FullCalendarController extends ControllerBase {
     $query->condition('n.status', NodeInterface::PUBLISHED);
     $query->condition('n.type', 'activity');
     $query->orderBy('n.title');
+    $query->range(0, 6);
     $result = $query->execute();
 
     $categories = [];
