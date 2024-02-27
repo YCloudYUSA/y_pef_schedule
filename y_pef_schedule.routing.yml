@@ -56,6 +56,14 @@ y_pef_schedule.schedules_ajax_date_range:
     location: ''
     start: '0'
     end: '0'
-    categories: []
+    categories: ''
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.schedules_categories:
+  path: '/schedules-categories'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getCategories'
+    _title: 'Categories'
   requirements:
     _permission: 'access content'

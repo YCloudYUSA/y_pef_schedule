@@ -2,3 +2,32 @@ tr,
 .draggable-table.tabledrag-disabled tr {
   background: none !important;
 }
+
+/* PDF BUTTON STYLES */
+.download-pdf-button {
+  background-color: unset;
+  color: #000000;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: normal;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  margin: 0;
+  box-shadow: none;
+  transition: background-color 0.2s;
+  gap: 10px;
+}
+.download-pdf-button:hover,
+.download-pdf-button:focus {
+  background-color: #000000;
+  color: #ffffff;
+  text-decoration: none;
+}
+.download-pdf-button i {
+  font-size: 14px;
+}

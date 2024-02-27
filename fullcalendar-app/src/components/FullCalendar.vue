@@ -45,6 +45,7 @@ import EventPopover from './EventPopover.vue';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import EventService from '../service/EventService';
 import { formatDateTimeLocal, updateUrlParams } from '@/utils/dateUtils';
+import axios from 'axios';
 
 
 export default {
@@ -61,12 +62,14 @@ export default {
       popoverStyle: {},
       selectedEvent: null,
       selectedCategories: [],
-      categories: [
-        "Academic Enrichment - Youth",
-        "Swim Lessons - Youth",
-        "Birthday Parties",
-        "Swim Lessons - Preschool"
-      ],
+      initializationCompleted: false, // Додано нову змінну стану
+      categories: [],
+      // categories: [
+      //   { name: 'Academic Enrichment - Youth', color: '#FFD700'},
+      //   { name: 'Swim Lessons - Youth', color: '#FF8C00'},
+      //   { name: 'Birthday Parties', color: '#FFD700'},
+      //   { name: 'Swim Lessons - Preschool', color: '#FFD700'},
+      // ],
       calendarOptions: {
         plugins: [
           interactionPlugin,
@@ -74,11 +77,11 @@ export default {
           bootstrap5Plugin
         ],
         themeSystem : "bootstrap5",
-        headerToolbar: {
-          left: 'prev, next, today',
-          center: 'title',
-          right: ''
-        },
+        // headerToolbar: {
+        //   left: 'prev, next, today',
+        //   center: 'title',
+        //   right: ''
+        // },
         initialView: 'timeGridWeek',
         editable: true,
         selectable: true,
@@ -96,13 +99,27 @@ export default {
       }
     };
   },
-  created() { this.eventService = new EventService(); },
+  created() {
+    this.eventService = new EventService();
+    this.loadCategories();
+  },
   mounted() {
-    const { start, end } = this.getInitialDateParams();
-    start && end ? this.loadEvents(start, end) : this.loadEvents();
+    const { start, end, categories } = this.getUrlParams();
 
-    if (start) {
+    if (categories.length > 0) {
+      this.handleCategoryChange(categories, true);
+    }
+
+    if (start && end) {
       this.setInitialDate(start);
+      this.loadEvents(start, end, true)
+    }
+    else {
+      // If the URL parameters are not set, we perform the initialization by default.
+      const today = new Date();
+      const start = today.toISOString().split('T')[0];
+      const end = new Date(today.setDate(today.getDate() + 7)).toISOString().split('T')[0];
+      this.loadEvents(start, end, true);
     }
   },
   methods: {
@@ -150,22 +167,36 @@ export default {
       calendarApi.addEvent(newEvent);
     },
     async handleWeekChange(payload) {
-      const { startStr, endStr } = payload;
-      await this.loadEvents(startStr, endStr)
-
-      updateUrlParams(startStr);
+      // We check that initialization is complete before calling loadEvents.
+      if (this.initializationCompleted) {
+        const { startStr, endStr } = payload;
+        await this.loadEvents(startStr, endStr);
+        updateUrlParams(startStr, endStr);
+      }
     },
-    handleCategoryChange(categories) {
+    handleCategoryChange(categories, isMounted) {
       const calendarApi = this.$refs.fullCalendar.getApi();
       const start = calendarApi.view.activeStart.toISOString();
       const end = calendarApi.view.activeEnd.toISOString();
 
       this.selectedCategories = categories
-      this.loadEvents(start, end);
+      // If the function is called on mount, we avoid calling loadEvents again.
+      if (!isMounted) {
+        this.loadEvents(start, end);
+      }
+
+      updateUrlParams(start, end, categories);
     },
-    async loadEvents(start, end) {
-      this.eventService.getEvents(start, end, this.selectedCategories)
-        .then(data => this.calendarOptions.events = data);
+    async loadEvents(start, end, isInitialization = false) {
+      // A condition to prevent redundant calls during initialization.
+      if (isInitialization || this.initializationCompleted) {
+        this.eventService.getEvents(start, end, this.selectedCategories)
+          .then(data => {
+            this.calendarOptions.events = data;
+
+            if (isInitialization) this.initializationCompleted = true; // Встановлюємо, що ініціалізація завершена
+          });
+      }
     },
     checkSameDaySelection(selectInfo) {
       const start = selectInfo.start;
@@ -181,12 +212,13 @@ export default {
       };
       // this.eventService.updateEventOnServer(event);
     },
-    getInitialDateParams() {
+    getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
 
       return {
         start: urlParams.get('start'),
-        end: urlParams.get('end')
+        end: urlParams.get('end'),
+        categories: urlParams.get('categories')?.split(',') || []
       };
     },
     handleEventClick(clickInfo) {
@@ -233,6 +265,16 @@ export default {
       // Logic to set the start date of the calendar.
       const calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.gotoDate(startDate);
+    },
+    loadCategories() {
+      axios.get('/schedules-categories')
+        .then(response => {
+          console.log('data', response.data);
+          this.categories = response.data
+        })
+        .catch(error => {
+          console.error('Error loading classes:', error);
+        });
     },
   }
 };

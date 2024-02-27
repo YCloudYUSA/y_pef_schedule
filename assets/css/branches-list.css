@@ -22,12 +22,6 @@
   font-weight: 500;
 }
 
-.schedule-link::before {
-  content: '\f105'; /* FontAwesome right arrow */
-  font-family: 'Font Awesome 5 Free';
-  padding-right: 10px;
-}
-
 /* Card style */
 .schedule-item {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);

@@ -228,4 +228,26 @@ class FullCalendarController extends ControllerBase {
     return new JsonResponse($res);
   }
 
+  public function getCategories(): JsonResponse {
+    $query = \Drupal::database()->select('node_field_data', 'n');
+    $query->fields('n', ['nid', 'title']);
+    $query->condition('n.status', NodeInterface::PUBLISHED);
+    $query->condition('n.type', 'activity');
+    $query->orderBy('n.title');
+    $result = $query->execute();
+
+    $categories = [];
+    foreach ($result as $record) {
+      // TODO: We assume that the color will be determined later, so for now we put a placeholder.
+      $color = '#FFD700';
+
+      $categories[] = [
+        'name' => $record->title,
+        'color' => $color,
+      ];
+    }
+
+    return new JsonResponse($categories);
+  }
+
 }
