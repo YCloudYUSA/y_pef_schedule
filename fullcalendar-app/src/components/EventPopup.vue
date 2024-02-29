@@ -4,7 +4,7 @@
       <div class="modal-dialog modal-dialog-centered" role="document" @click.stop>
         <div class="modal-content border-0 shadow-lg rounded-lg">
           <div class="modal-header bg-primary text-white rounded-top">
-            <h5 class="modal-title">Create event</h5>
+            <h5 class="modal-title">{{this.event.label}} event</h5>
             <button type="button" class="close text-white" @click="handleClose">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -63,7 +63,7 @@
                 <input type="color" class="form-control form-control-color" id="color" v-model="event.colorEvent" name="color" title="Choose a color">
               </div>
 
-              <button type="submit" class="btn btn-success mt-3">Create</button>
+              <button type="submit" class="btn btn-success mt-3">{{this.event.label}}</button>
             </form>
           </div>
         </div>
@@ -208,6 +208,7 @@ export default {
           end: this.formatDateTimeLocal(newVal.end),
           colorEvent: newVal.colorEvent || '#3788d8',
           days: newVal.days ? newVal.days.split(',') : [],
+          label: this.event.nid ? 'Update' : 'Create',
         };
         this.event.startGlobal =  this.event.startGlobal ? this.formatDateTimeLocal(newVal.startGlobal) : this.event.start
         this.event.endGlobal =  this.event.endGlobal ? this.formatDateTimeLocal(newVal.endGlobal) : this.event.end
