@@ -3,6 +3,7 @@
 namespace Drupal\y_pef_schedule\Controller;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\openy_repeat\Controller\RepeatController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,6 +39,8 @@ class RepeatScheduleController extends RepeatController {
     $query->leftJoin('node', 'n', 're.session = n.nid');
     $query->innerJoin('node_field_data', 'nd', 're.location = nd.nid');
     $query->innerJoin('node_field_data', 'nds', 'n.nid = nds.nid');
+    $query->leftJoin('node__field_session_color', 'nfc', 'n.nid = nfc.entity_id');
+    $query->leftJoin('node__field_session_description', 'nfd', 'n.nid = nfd.entity_id');
     $query->addField('n', 'nid');
     $query->addField('nd', 'title', 'location');
     $query->addField('nds', 'title', 'name');
@@ -51,14 +54,31 @@ class RepeatScheduleController extends RepeatController {
       'register_text',
       'duration',
       'productid',
+      'weekday',
     ]);
+
+    $subquery = $this->database->select('node__field_session_time', 'nft');
+    $subquery->innerJoin('paragraph__field_session_time_days', 'ptd', 'ptd.entity_id = nft.field_session_time_target_id');
+    $subquery->innerJoin('paragraph__field_session_time_date', 'psd', 'psd.entity_id = nft.field_session_time_target_id');
+    $subquery->addField('nft', 'entity_id', 'id');
+    $subquery->addField('psd', 'field_session_time_date_value', 'start_date');
+    $subquery->addField('psd', 'field_session_time_date_end_value', 'end_date');
+    $subquery->addExpression('GROUP_CONCAT(ptd.field_session_time_days_value)', 'days');
+    $subquery->groupBy('nft.field_session_time_target_id');
+    $query->leftJoin($subquery, 'sq', 're.session = sq.id');
+
+    $query->addField('sq', 'days');
+    $query->addField('sq', 'start_date', 'time_start_calendar_global');
+    $query->addField('sq', 'end_date', 'time_end_calendar_global');
+    $query->addField('nfc', 'field_session_color_value', 'color');
+    $query->addField('nfd', 'field_session_description_value', 'description');
     $query->addField('re', 'start', 'start_timestamp');
     $query->addField('re', 'end', 'end_timestamp');
     // Query conditions.
-    $query->distinct();
+//    $query->distinct();
 
-    $query->condition('re.start', $end_date, '<=');
-    $query->condition('re.end', $start_date, '>=');
+    $query->condition('re.start', $this->converUnixTime($end_date), '<=');
+    $query->condition('re.end',  $this->converUnixTime($start_date), '>=');
 
     if (!empty($categories)) {
       $query->condition('re.category', explode(',', $categories), 'IN');
@@ -104,17 +124,31 @@ class RepeatScheduleController extends RepeatController {
         }
       }
 
+      if (!empty($item->description)) {
+        $result[$key]->description = strip_tags($item->description);
+      }
+
       $result[$key]->class_info = $classes_info[$item->class];
 
       $result[$key]->time_start_sort = $this->dateFormatter->format((int) $item->start_timestamp, 'custom', 'Hi');
 
+      $tz = new \DateTimeZone(date_default_timezone_get());
       // Convert timezones for start_time and end_time.
       $time_start = new \DateTime();
       $time_start->setTimestamp($item->start_timestamp);
-      $time_start->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+      $time_start->setTimezone($tz);
       $time_end = new \DateTime();
       $time_end->setTimestamp($item->end_timestamp);
-      $time_end->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+      $time_end->setTimezone($tz);
+      $tzUtc = new \DateTimeZone('UTC');
+      $time_start_calendar_global = new \DateTime($item->time_start_calendar_global, $tzUtc);
+      $time_start_calendar_global->setTimezone($tz);
+    $time_end_calendar_global = new \DateTime($item->time_end_calendar_global, $tzUtc);
+      $time_end_calendar_global->setTimezone($tz);
+
+      $result[$key]->time_start_calendar_global = $time_start_calendar_global->format('Y-m-d H:i:s');
+      $result[$key]->time_end_calendar_global = $time_end_calendar_global->format('Y-m-d H:i:s');
+
       $result[$key]->time_start = $time_start->format('g:iA');
       $result[$key]->time_end = $time_end->format('g:iA');
 
@@ -138,4 +172,10 @@ class RepeatScheduleController extends RepeatController {
     return $result;
   }
 
+  protected function converUnixTime($datetime) {
+    $tz =\Drupal::configFactory()->get('system.date')->get('timezone')['default'];
+    $date_obj = new DrupalDateTime($datetime, $tz);
+    $r = $date_obj->format('U', ['timezone'=>  $tz]);
+    return $r;
+  }
 }

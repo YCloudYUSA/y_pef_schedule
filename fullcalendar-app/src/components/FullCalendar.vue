@@ -9,8 +9,9 @@
 
     <FullCalendar ref="fullCalendar" :options="calendarOptions">
       <template v-slot:eventContent="arg">
-        <b>{{ arg.timeText }}</b>
         <i>{{ arg.event.title }}</i>
+        <br>
+        <b>{{ arg.timeText }}</b>
       </template>
     </FullCalendar>
 
@@ -46,7 +47,7 @@ import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import EventService from '../service/EventService';
 import { formatDateTimeLocal, updateUrlParams } from '@/utils/dateUtils';
 import axios from 'axios';
-import html2pdf from 'html2pdf.js'
+import html2pdf from 'html2pdf.js';
 
 
 export default {
@@ -167,7 +168,8 @@ export default {
     handleSelect(selectInfo) {
       this.selectedEvent = {
         start: selectInfo.startStr,
-        end: selectInfo.endStr
+        end: selectInfo.endStr,
+        location: this.eventService.getBranch(),
       };
 
       this.openPopup('eventPopup')
@@ -294,6 +296,15 @@ export default {
         title: clickInfo.event.title,
         start: clickInfo.event.start,
         end: clickInfo.event.end,
+        room: clickInfo.event.extendedProps.room,
+        colorEvent: clickInfo.event.extendedProps.colorEvent,
+        instructor: clickInfo.event.extendedProps.instructor,
+        description: clickInfo.event.extendedProps.description,
+        locationId: clickInfo.event.extendedProps.locationId,
+        classId: clickInfo.event.extendedProps.classId,
+        days: clickInfo.event.extendedProps.days,
+        startGlobal: clickInfo.event.extendedProps.startGlobal,
+        endGlobal: clickInfo.event.extendedProps.endGlobal,
         // ... other fields.
       };
 

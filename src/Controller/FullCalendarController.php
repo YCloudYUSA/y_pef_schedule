@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\y_pef_schedule\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\node\NodeInterface;
 use Drupal\paragraphs\Entity\Paragraph;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -75,13 +76,13 @@ class FullCalendarController extends ControllerBase {
 
     $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
     $time_paragraph = $paragraph_storage->load($node->field_session_time->target_id);
-
     $time_paragraph->set('field_session_time_date',
       [
-        'value' => $event['start'],
-        'end_value' => $event['end'],
+        'value' => $this->convertDate($event['startGlobal']),
+        'end_value' => $this->convertDate($event['endGlobal']),
       ]
     );
+    $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
     $time_paragraph->save();
 
     $paragraphs[] = [
@@ -90,6 +91,8 @@ class FullCalendarController extends ControllerBase {
     ];
 
     $node->set('field_session_time', $paragraphs);
+    $node->setTitle($event['title']);
+    $this->setFieldsSession($node, $event);
     $node->save();
 
     $response = new Response();
@@ -142,7 +145,9 @@ class FullCalendarController extends ControllerBase {
     ]);
 
     $session->set('field_session_time', $this->getSessionTime($data));
-    $session->set('field_session_location', ['target_id' => $data['location']]);
+    $session->set('field_session_location', ['target_id' => $data['locationId']]);
+
+    $this->setFieldsSession($session, $data);
     $session->save();
 
     $response = new Response();
@@ -151,6 +156,12 @@ class FullCalendarController extends ControllerBase {
     return $response;
   }
 
+  protected function setFieldsSession(&$session, $data) {
+    $session->set('field_session_room', $data['room'] ?? '');
+    $session->set('field_session_instructor', $data['instructor'] ?? '');
+    $session->set('field_session_description', $data['description'] ?? '');
+    $session->set('field_session_color', $data['colorEvent'] ?? '');
+  }
   /**
    * Creates a Paragraph entity for session time.
    *
@@ -168,8 +179,8 @@ class FullCalendarController extends ControllerBase {
     // Format: 'value' => '2024-01-11T17:43:47',
     $paragraph->set('field_session_time_date',
       [
-        'value' => $scheduleData['start'],
-        'end_value' => $scheduleData['end'],
+        'value' => $this->convertDate($scheduleData['startGlobal']),
+        'end_value' => $this->convertDate($scheduleData['endGlobal']),
       ]
     );
     $paragraph->isNew();
@@ -183,6 +194,10 @@ class FullCalendarController extends ControllerBase {
     return $paragraphs;
   }
 
+  protected function convertDate($date) {
+    $date_obj = new DrupalDateTime($date, \Drupal::configFactory()->get('system.date')->get('timezone')['default']);
+    return substr($date_obj->format('c', ['timezone'=> 'UTC']), 0, 19);
+  }
   /**
    * Retrieves a list of branches.
    *
