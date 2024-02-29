@@ -102,6 +102,7 @@ class RepeatScheduleController extends RepeatController {
     }
     $result = $query->execute()->fetchAll();
 
+    $week = $this->getWeekDate($start_date);
     $locations_info = $this->getLocationsInfo();
 
     $classesIds = [];
@@ -153,8 +154,8 @@ class RepeatScheduleController extends RepeatController {
       $result[$key]->time_end = $time_end->format('g:iA');
 
       // Example of calendar format 2018-08-21 14:15:00.
-      $result[$key]->time_start_calendar = $this->dateFormatter->format((int) $item->start_timestamp, 'custom', 'Y-m-d H:i:s');
-      $result[$key]->time_end_calendar = $this->dateFormatter->format((int) $item->start_timestamp + $item->duration * 60, 'custom', 'Y-m-d H:i:s');
+      $result[$key]->time_start_calendar = $week[$item->weekday] . ' ' . $this->dateFormatter->format((int) $item->start_timestamp, 'custom', 'H:i:s');
+      $result[$key]->time_end_calendar = $week[$item->weekday] . ' ' . $this->dateFormatter->format((int) $item->start_timestamp + $item->duration * 60, 'custom', 'H:i:s');
       $result[$key]->timezone = date_default_timezone_get();
 
       // Durations.
@@ -177,5 +178,20 @@ class RepeatScheduleController extends RepeatController {
     $date_obj = new DrupalDateTime($datetime, $tz);
     $r = $date_obj->format('U', ['timezone'=>  $tz]);
     return $r;
+  }
+
+  protected function getWeekDate($start) {
+    $week = [];
+    $tz = \Drupal::configFactory()->get('system.date')->get('timezone')['default'];
+    $date = new DrupalDateTime($start, $tz);
+    while (true) {
+      $day = $date->format('N');
+      if (isset($week[$day])) {
+        break;
+      }
+      $week[$day] = $date->format('Y-m-d');
+      $date->modify('+1 day');
+    }
+    return $week;
   }
 }
