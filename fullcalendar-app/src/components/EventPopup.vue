@@ -202,17 +202,15 @@ export default {
       deep: true,
       immediate: true,
       handler(newVal) {
-        console.log('start')
         this.event = {
           ...newVal,
           start: this.formatDateTimeLocal(newVal.start),
           end: this.formatDateTimeLocal(newVal.end),
-          startGlobal: this.formatDateTimeLocal(newVal.startGlobal),
-          endGlobal: this.formatDateTimeLocal(newVal.endGlobal),
           colorEvent: newVal.colorEvent || '#3788d8',
           days: newVal.days ? newVal.days.split(',') : [],
         };
-        console.log(this.event)
+        this.event.startGlobal =  this.event.startGlobal ? this.formatDateTimeLocal(newVal.startGlobal) : this.event.start
+        this.event.endGlobal =  this.event.endGlobal ? this.formatDateTimeLocal(newVal.endGlobal) : this.event.end
       }
     }
   },
@@ -266,13 +264,18 @@ export default {
         console.log('Sending event to the server ...', eventData);
         // TODO: Should be const in configuration.
         let url;
-        if (eventData.id) {
+        if (eventData.nid) {
           url ='/admin/openy/schedules/update-event';
         } else {
           url = '/admin/openy/schedules/create-event';
         }
         const response = await axios.post(url, eventData);
         if (response.status === 200) {
+
+          if (response.data.id) {
+            eventData.nid = response.data.id;
+          }
+
           this.$emit('save', eventData);
           this.handleClose();
         }
@@ -281,6 +284,7 @@ export default {
       }
     },
     submitEvent() {
+      this.event.color = this.event.colorEvent;
       this.sendEventToServer(this.event);
     },
     handleClose() {

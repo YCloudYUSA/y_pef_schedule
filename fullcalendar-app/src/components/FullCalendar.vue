@@ -45,7 +45,11 @@ import EventPopup from './EventPopup.vue';
 import EventPopover from './EventPopover.vue';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import EventService from '../service/EventService';
-import { formatDateTimeLocal, updateUrlParams } from '@/utils/dateUtils';
+import {
+  combineDateTime,
+  formatDateTimeLocal,
+  updateUrlParams
+} from '@/utils/dateUtils';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
 
@@ -75,6 +79,7 @@ export default {
         themeSystem : "bootstrap5",
         initialView: window.innerWidth > 768 ? 'timeGridWeek' : 'timeGridDay',
         editable: true,
+        eventResizableFromStart: false,
         selectable: true,
         selectAllow: this.checkSameDaySelection,
         selectMirror: true,
@@ -101,6 +106,7 @@ export default {
         eventClick: this.handleEventClick,
         eventDrop: this.updateEvent,
         eventResize: this.updateEvent,
+        eventAllow: this.eventAllow,
       }
     };
   },
@@ -174,6 +180,14 @@ export default {
     },
     openPopup(type) { this.activeModal = type; },
     closePopup() { this.activeModal = null; },
+    eventAllow(dropInfo, draggedEvent) {
+      if (dropInfo.start.getDay() === draggedEvent.start.getDay()) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    },
     handleSelect(selectInfo) {
       this.selectedEvent = {
         start: selectInfo.startStr,
@@ -203,8 +217,9 @@ export default {
         calendarEvent.setProp('title', updatedEvent.title);
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
+        calendarEvent.setProp('color', updatedEvent.colorEvent);
+        calendarEvent.setExtendedProp('colorEvent', updatedEvent.colorEvent);
       }
-
       // this.eventService.updateEventOnServer(updatedEvent);
     },
     addEvent(newEvent) {
@@ -213,6 +228,9 @@ export default {
     },
     addEventToCalendar(newEvent) {
       const calendarApi = this.$refs.fullCalendar.getApi();
+      newEvent.id = newEvent.nid + '-' + Math.random().toString(16).slice(2);
+      console.log(newEvent)
+
       calendarApi.addEvent(newEvent);
     },
     async handleWeekChange(payload) {
@@ -256,11 +274,12 @@ export default {
     },
     updateEvent(eventInfo) {
       const event = {
-        id: eventInfo.event.id,
-        start: formatDateTimeLocal(eventInfo.event.start),
-        end: formatDateTimeLocal(eventInfo.event.end),
+        id: eventInfo.event.extendedProps.nid,
+        nid: eventInfo.event.extendedProps.nid,
+        startGlobal: combineDateTime(eventInfo.event.extendedProps.startGlobal, eventInfo.event.start),
+        endGlobal: combineDateTime(eventInfo.event.extendedProps.endGlobal, eventInfo.event.end),
       };
-      // this.eventService.updateEventOnServer(event);
+       this.eventService.updateEventOnServer(event);
     },
     getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -303,6 +322,7 @@ export default {
 
       this.selectedEvent = {
         id: clickInfo.event.id,
+        nid: clickInfo.event.extendedProps.nid,
         title: clickInfo.event.title,
         start: clickInfo.event.start,
         end: clickInfo.event.end,

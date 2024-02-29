@@ -65,14 +65,14 @@ class FullCalendarController extends ControllerBase {
    * @param Request $request
    *    The current request object.
    *
-   * @return Response
+   * @return JsonResponse
    */
-  public function updateEvent(Request $request): Response {
+  public function updateEvent(Request $request): JsonResponse {
     // TODO: Will be good to reuse code from the \Drupal\openy_daxko_gxp_syncer\syncer\SessionManager::updateSession
     $event = $request->toArray();
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');
     /** @var \Drupal\node\NodeInterface $node */
-    $node = $node_storage->load($event['id']);
+    $node = $node_storage->load($event['nid']);
 
     $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
     $time_paragraph = $paragraph_storage->load($node->field_session_time->target_id);
@@ -82,7 +82,9 @@ class FullCalendarController extends ControllerBase {
         'end_value' => $this->convertDate($event['endGlobal']),
       ]
     );
-    $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
+    if ($event["days"]){
+      $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
+    }
     $time_paragraph->save();
 
     $paragraphs[] = [
@@ -91,14 +93,13 @@ class FullCalendarController extends ControllerBase {
     ];
 
     $node->set('field_session_time', $paragraphs);
-    $node->setTitle($event['title']);
+    if ($event['title']){
+      $node->setTitle($event['title']);
+    }
     $this->setFieldsSession($node, $event);
     $node->save();
 
-    $response = new Response();
-    $response->headers->set('Content-Type', 'text/plain');
-
-    return $response;
+    return new JsonResponse(['id' => $node->id()]);
   }
 
   /**
@@ -107,16 +108,11 @@ class FullCalendarController extends ControllerBase {
    * @param Request $request
    *    The current request object.
    *
-   * @return Response
+   * @return JsonResponse
    */
-  public function createEvent(Request $request): Response {
+  public function createEvent(Request $request): JsonResponse {
     $event_data = $request->toArray();
-    $this->createSession($event_data);
-
-    $response = new Response();
-    $response->headers->set('Content-Type', 'text/plain');
-
-    return $response;
+    return $this->createSession($event_data);
   }
 
   /**
@@ -125,9 +121,9 @@ class FullCalendarController extends ControllerBase {
    * @param array $data
    *    The event data.
    *
-   * @return Response
+   * @return JsonResponse
    */
-  public function createSession(array $data): Response {
+  public function createSession(array $data): JsonResponse {
     // TODO: \Drupal\openy_daxko_gxp_syncer\syncer\SessionManager::createSession
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');
 
@@ -150,17 +146,21 @@ class FullCalendarController extends ControllerBase {
     $this->setFieldsSession($session, $data);
     $session->save();
 
-    $response = new Response();
-    $response->headers->set('Content-Type', 'text/plain');
-
-    return $response;
+    return new JsonResponse(['id' => $session->id()]);
   }
 
   protected function setFieldsSession(&$session, $data) {
-    $session->set('field_session_room', $data['room'] ?? '');
-    $session->set('field_session_instructor', $data['instructor'] ?? '');
-    $session->set('field_session_description', $data['description'] ?? '');
-    $session->set('field_session_color', $data['colorEvent'] ?? '');
+    $fields = [
+      'field_session_room' => 'room',
+      'field_session_instructor' => 'field_session_color',
+      'field_session_description' => 'description',
+      'field_session_color' => 'colorEvent',
+    ];
+    foreach ($fields as $key => $dataKey) {
+      if (!empty($data[$dataKey])) {
+        $session->set($key, $data[$dataKey]);
+      }
+    }
   }
   /**
    * Creates a Paragraph entity for session time.
