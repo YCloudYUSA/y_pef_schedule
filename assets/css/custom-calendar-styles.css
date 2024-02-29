@@ -1,6 +1,9 @@
-tr,
-.draggable-table.tabledrag-disabled tr {
+#fullcalendar-app tr,
+#fullcalendar-app .draggable-table.tabledrag-disabled tr {
   background: none !important;
+}
+#fullcalendar-app table {
+  margin-top: 0 !important;
 }
 
 /* PDF BUTTON STYLES */

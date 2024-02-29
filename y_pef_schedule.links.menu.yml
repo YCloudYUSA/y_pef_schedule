@@ -1,0 +1,5 @@
+y_pef_schedule.branches:
+  title: 'Schedules Calendar'
+  description: 'Select a brunch to view the schedule.'
+  parent: system.admin_content
+  route_name: y_pef_schedule.branches
