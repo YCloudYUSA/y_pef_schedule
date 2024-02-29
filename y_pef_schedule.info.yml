@@ -2,7 +2,9 @@ name: Y PEF Schedules Admin tool
 type: module
 description: Additional module to manage your branch schedules.
 core_version_requirement: ^10
-package: 'YMCA Website Services'
+configure: y_pef_schedule.branches
+package: 'Open Y'
 version: 0.1
+lifecycle: experimental
 dependencies:
   - drupal:openy_repeat

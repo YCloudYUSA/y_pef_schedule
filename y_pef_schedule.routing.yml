@@ -4,7 +4,7 @@ y_pef_schedule.branches:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branchesListPage'
     _title: 'Branches'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.branches_options:
   path: '/branches-options'
@@ -12,7 +12,7 @@ y_pef_schedule.branches_options:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getBranchesOptions'
     _title: 'Schedules'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.classes_options:
   path: '/classes-options'
@@ -20,7 +20,7 @@ y_pef_schedule.classes_options:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getClassesOptions'
     _title: 'Schedules'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.create_event:
   path: '/admin/openy/schedules/create-event'
@@ -28,7 +28,7 @@ y_pef_schedule.create_event:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::createEvent'
     _title: 'Create event'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.update_event:
   path: '/admin/openy/schedules/update-event'
@@ -36,7 +36,7 @@ y_pef_schedule.update_event:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::updateEvent'
     _title: 'Update event'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 
 y_pef_schedule.fullcalendar:
@@ -47,7 +47,7 @@ y_pef_schedule.fullcalendar:
     branch: ''
     start_date: '0'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.schedules_ajax_date_range:
   path: '/schedules/get-event-data-date-range/{location}/{start}/{end}/{categories}'
@@ -58,7 +58,7 @@ y_pef_schedule.schedules_ajax_date_range:
     end: '0'
     categories: ''
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'
 
 y_pef_schedule.schedules_categories:
   path: '/schedules-categories'
@@ -66,4 +66,4 @@ y_pef_schedule.schedules_categories:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getCategories'
     _title: 'Categories'
   requirements:
-    _permission: 'access content'
+    _permission: 'access administration pages'

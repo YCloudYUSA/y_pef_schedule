@@ -7,7 +7,9 @@
       </button>
 
     </div>
-    <div class="checkbox-container">
+
+    <button class="legend-toggle-button" @click="toggleLegend">Legend +</button>
+    <div :class="['checkbox-container', { active: isLegendOpen }]">
       <label class="custom-checkbox" v-for="category in categories" :key="category.name">
         <input
           type="checkbox"
@@ -30,7 +32,15 @@ export default {
     categories: Array,
     selectedCategories: Array
   },
+  data() {
+    return {
+      isLegendOpen: false,
+    };
+  },
   methods: {
+    toggleLegend() {
+      this.isLegendOpen = !this.isLegendOpen;
+    },
     isSelected(categoryName) {
       // Make sure selectedCategories is an array before calling includes
       if (Array.isArray(this.selectedCategories)) {
@@ -127,5 +137,28 @@ export default {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* MOBILE DEVICES */
+@media (max-width: 768px) {
+  .legend-toggle-button {
+    display: block;
+  }
+  .checkbox-container {
+    display: none;
+  }
+  .checkbox-container.active {
+    display: flex;
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 768px) {
+  .legend-toggle-button {
+    display: none;
+  }
+  .checkbox-container {
+    display: flex;
+  }
 }
 </style>

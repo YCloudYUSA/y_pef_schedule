@@ -68,7 +68,7 @@ export default {
       popoverStyle: {},
       selectedEvent: null,
       selectedCategories: [],
-      initializationCompleted: false, // Додано нову змінну стану
+      initializationCompleted: false,
       categories: [],
       calendarOptions: {
         plugins: [
@@ -77,21 +77,30 @@ export default {
           bootstrap5Plugin
         ],
         themeSystem : "bootstrap5",
-        // headerToolbar: {
-        //   left: 'prev, next, today',
-        //   center: 'title',
-        //   right: ''
-        // },
-        initialView: 'timeGridWeek',
+        initialView: window.innerWidth > 768 ? 'timeGridWeek' : 'timeGridDay',
         editable: true,
         eventResizableFromStart: false,
         selectable: true,
         selectAllow: this.checkSameDaySelection,
-        selectMirror: false,
+        selectMirror: true,
         weekends: true,
         dayMaxEvents: false,
         events: null,
         allDaySlot: false,
+        // Each slot lasting 30 minutes.
+        slotDuration: '00:30:00',
+        // Clicks and drags are "captured" every 30 minutes.
+        snapDuration: '00:30:00',
+        // Timestamps every hour.
+        slotLabelInterval: '01:00',
+        timeZone: 'local',
+        nowIndicator: true,
+        slotLabelFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          omitZeroMinute: false,
+          hour12: false,
+        },
         datesSet: this.handleWeekChange,
         select: this.handleSelect,
         eventClick: this.handleEventClick,
@@ -249,7 +258,8 @@ export default {
           .then(data => {
             this.calendarOptions.events = data;
 
-            if (isInitialization) this.initializationCompleted = true; // Встановлюємо, що ініціалізація завершена
+            // We establish that the initialization is complete.
+            if (isInitialization) this.initializationCompleted = true;
           });
       }
     },
