@@ -82,7 +82,9 @@ class FullCalendarController extends ControllerBase {
         'end_value' => $this->convertDate($event['endGlobal']),
       ]
     );
-    $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
+    if ($event["days"]){
+      $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
+    }
     $time_paragraph->save();
 
     $paragraphs[] = [
@@ -91,7 +93,9 @@ class FullCalendarController extends ControllerBase {
     ];
 
     $node->set('field_session_time', $paragraphs);
-    $node->setTitle($event['title']);
+    if ($event['title']){
+      $node->setTitle($event['title']);
+    }
     $this->setFieldsSession($node, $event);
     $node->save();
 
@@ -157,10 +161,17 @@ class FullCalendarController extends ControllerBase {
   }
 
   protected function setFieldsSession(&$session, $data) {
-    $session->set('field_session_room', $data['room'] ?? '');
-    $session->set('field_session_instructor', $data['instructor'] ?? '');
-    $session->set('field_session_description', $data['description'] ?? '');
-    $session->set('field_session_color', $data['colorEvent'] ?? '');
+    $fields = [
+      'field_session_room' => 'room',
+      'field_session_instructor' => 'field_session_color',
+      'field_session_description' => 'description',
+      'field_session_color' => 'colorEvent',
+    ];
+    foreach ($fields as $key => $dataKey) {
+      if (!empty($data[$dataKey])) {
+        $session->set($key, $data[$dataKey]);
+      }
+    }
   }
   /**
    * Creates a Paragraph entity for session time.

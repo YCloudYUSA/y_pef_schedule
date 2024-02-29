@@ -8,8 +8,23 @@
  * @returns {string} The formatted date-time string.
  */
 export function formatDateTimeLocal(date) {
-  return date.toISOString().slice(0, 19);
+  const dateObj = new Date(date);
+  const offset = dateObj.getTimezoneOffset();
+  dateObj.setMinutes(dateObj.getMinutes() - offset);
+  return dateObj.toISOString().slice(0, 19);
 }
+
+/**
+ * Combine global date event with new time event.
+ *
+ * @param {string} originalDate - The Date string Global.
+ * @param {Date} newDate - The Date object to format.
+ * @returns {string} The formatted date-time string.
+ */
+export function combineDateTime(originalDate, newDate) {
+  return `${originalDate.slice(0, 10)} ${newDate.getHours()}:${newDate.getMinutes()}:${newDate.getSeconds()}`;
+}
+
 
 /**
  * Updates the browser's URL by setting new query parameters for start date

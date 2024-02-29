@@ -207,12 +207,11 @@ export default {
           ...newVal,
           start: this.formatDateTimeLocal(newVal.start),
           end: this.formatDateTimeLocal(newVal.end),
-          startGlobal: this.formatDateTimeLocal(newVal.startGlobal),
-          endGlobal: this.formatDateTimeLocal(newVal.endGlobal),
           colorEvent: newVal.colorEvent || '#3788d8',
           days: newVal.days ? newVal.days.split(',') : [],
         };
-        console.log(this.event)
+        this.event.startGlobal =  this.event.startGlobal ? this.formatDateTimeLocal(newVal.startGlobal) : this.event.start
+        this.event.endGlobal =  this.event.endGlobal ? this.formatDateTimeLocal(newVal.endGlobal) : this.event.end
       }
     }
   },
@@ -281,6 +280,7 @@ export default {
       }
     },
     submitEvent() {
+      this.event.color = this.event.colorEvent;
       this.sendEventToServer(this.event);
     },
     handleClose() {
