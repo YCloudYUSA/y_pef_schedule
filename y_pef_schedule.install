@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Installation and update implementations.
+ */
+
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+
+/**
+ * Implements hook_install().
+ */
+function y_pef_schedule_install() {
+  // Create fields.
+  _y_pef_schedule_create_fields();
+}
+
+/**
+ * Implements hook_install().
+ */
+function y_pef_schedule_uninstall() {
+  // Remove field.
+  _y_pef_schedule_remove_fields();
+}
+
+/**
+ * Create required fields.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _y_pef_schedule_create_fields() {
+  // Create field storage and config for 'color event' field.
+  FieldStorageConfig::create([
+    'field_name' => 'field_session_color',
+    'entity_type' => 'node',
+    'type' => 'string',
+    'settings' => [
+      'max_length' => 255,
+    ],
+    'cardinality' => 1,
+  ])->save();
+  FieldConfig::create([
+    'field_name' => 'field_session_color',
+    'entity_type' => 'node',
+    'bundle' => 'session',
+    'label' => 'Session color',
+    'description' => 'Hex color for event.',
+  ])->save();
+
+  _y_pef_schedule_update_displays_on_install();
+}
+
+/**
+ * Update Session content type display modes on enabling the module.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _y_pef_schedule_update_displays_on_install() {
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
+  $entity_display_repository = \Drupal::service('entity_display.repository');
+
+  // Update Branch content type form display.
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+  $form_display = $entity_display_repository->getFormDisplay('node', 'session');
+  $form_display->setComponent('field_session_color', [
+    'type' => 'string_textfield',
+    'settings' => [
+      'display_label' => TRUE,
+    ],
+    'weight' => 20,
+  ]);
+
+  $form_display->save();
+}
+
+/**
+ * Remove required fields.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _y_pef_schedule_remove_fields() {
+  $field_to_delete = 'field_session_color';
+    $field_config = FieldConfig::loadByName('node', 'session', $field_to_delete);
+    if ($field_config instanceof FieldConfig) {
+      $field_config->delete();
+    }
+    // Deleting field storage.
+    $field_config_storage = FieldStorageConfig::loadByName('node', $field_to_delete);
+    if ($field_config_storage instanceof FieldStorageConfig) {
+      $field_config_storage->delete();
+    }
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function y_pef_schedule_update_9001(&$sandbox) {
+  _y_pef_schedule_create_fields();
+}

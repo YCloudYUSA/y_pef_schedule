@@ -10,8 +10,8 @@ export default class EventService {
     }
 
     // Convert start and end dates to ISO strings which are effectively timestamps
-    const formattedStart = Math.floor(getTime(start) / 1000);
-    const formattedEnd = Math.floor(getTime(end) / 1000);
+    const formattedStart = start.substr(0, 19);
+    const formattedEnd = end.substr(0, 19);
 
     const branch = encodeURIComponent(this.getBranch());
     const categoryParams = categories.length > 0 ? '/' + categories.join(',') : '';
@@ -24,6 +24,16 @@ export default class EventService {
         title: event.name,
         start: event.time_start_calendar,
         end: event.time_end_calendar,
+        startGlobal: event.time_start_calendar_global,
+        endGlobal: event.time_end_calendar_global,
+        color: event.color,
+        colorEvent: event.color,
+        room: event.room,
+        instructor: event.instructor,
+        description: event.description,
+        days: event.days,
+        locationId: event.location_info.nid,
+        classId: event.class_info.nid,
       }));
     } catch (error) {
       // Implement better error handling, e.g., showing error messages to the user

@@ -19,7 +19,7 @@
               </div>
 
               <div class="mb-3">
-                <Select2 :options="selectClasses" required @change="changeClass($event)" @select="selectClass($event)" placeholder="Class"/>
+                <Select2 :options="selectClasses" v-model="event.classId" required @change="changeClass($event)" @select="selectClass($event)" placeholder="Class"/>
               </div>
 
               <div class="mb-3">
@@ -27,7 +27,7 @@
               </div>
 
               <div class="mb-3">
-                <Select2 class="mt-3" :options="selectLocations" @change="changeLocation($event)" @select="selectEvent($event)" placeholder="Location"/>
+                <Select2 class="mt-3" :options="selectLocations" required v-model="event.locationId" @change="changeLocation($event)" @select="selectEvent($event)" placeholder="Location"/>
               </div>
 
               <div class="mb-2">
@@ -41,18 +41,18 @@
               <div class="row g-2">
                 <div class="col-md-6">
                   <label for="start" class="form-label">Start date</label>
-                  <input type="datetime-local" class="form-control" id="start" v-model="event.start" name="start" required>
+                  <input type="datetime-local" class="form-control" id="start" v-model="event.startGlobal" name="start" required>
                 </div>
                 <div class="col-md-6">
                   <label for="end" class="form-label">End date</label>
-                  <input type="datetime-local" class="form-control" id="end" v-model="event.end" name="end" required>
+                  <input type="datetime-local" class="form-control" id="end" v-model="event.endGlobal" name="end" required>
                 </div>
               </div>
 
               <div class="day-selector">
                 <h5>Days</h5>
                 <div class="form-check" v-for="(day, index) in daysOfWeek" :key="index">
-                  <input class="form-check-input" type="checkbox" :value="day.id" v-model="selectedDays" :id="day.id">
+                  <input class="form-check-input" type="checkbox" :value="day.id" v-model="event.days" :id="day.id">
                   <label class="form-check-label" :for="day.id">
                     {{ day.text }}
                   </label>
@@ -60,7 +60,7 @@
               </div>
 
               <div class="mt-2">
-                <input type="color" class="form-control form-control-color" id="color" v-model="event.color" name="color" title="Choose a color">
+                <input type="color" class="form-control form-control-color" id="color" v-model="event.colorEvent" name="color" title="Choose a color">
               </div>
 
               <button type="submit" class="btn btn-success mt-3">Create</button>
@@ -162,6 +162,7 @@
 
 import axios from 'axios';
 import Select2 from 'vue3-select2-component';
+import {object} from "yup";
 
 export default {
   name: 'EventPopup',
@@ -183,6 +184,7 @@ export default {
       },
       selectClasses: [],
       selectLocations: [],
+      currentLocation: null,
       daysOfWeek: [
         { id: 'sunday', text: 'Sunday' },
         { id: 'monday', text: 'Monday' },
@@ -200,12 +202,17 @@ export default {
       deep: true,
       immediate: true,
       handler(newVal) {
+        console.log('start')
         this.event = {
           ...newVal,
           start: this.formatDateTimeLocal(newVal.start),
           end: this.formatDateTimeLocal(newVal.end),
-          color: newVal.color || '#000000'
+          startGlobal: this.formatDateTimeLocal(newVal.startGlobal),
+          endGlobal: this.formatDateTimeLocal(newVal.endGlobal),
+          colorEvent: newVal.colorEvent || '#3788d8',
+          days: newVal.days ? newVal.days.split(',') : [],
         };
+        console.log(this.event)
       }
     }
   },
@@ -231,7 +238,10 @@ export default {
           this.selectLocations = Object.entries(response.data).map(([id, title]) => ({
             id: id,
             text: title
-          }));
+          }))
+          if (this.event.location) {
+            this.event.locationId = this.selectLocations.filter((location) => this.event.location === location.text)[0].id
+          }
         })
         .catch(error => {
           console.error('Error loading options:', error);
@@ -246,7 +256,7 @@ export default {
     // TODO: Move to service.
     async sendEventToServer(eventData) {
       // Create an array of day IDs. If none are selected, use all days.
-      const dayIds = this.selectedDays.length ? this.selectedDays : this.daysOfWeek.map(day => day.id);
+      const dayIds = this.event.days.length ? this.event.days : this.daysOfWeek.map(day => day.id);
       // Assuming the server expects a string of comma-separated values.
       eventData.days = dayIds.join(',');
       eventData.location = this.event.location;
@@ -255,7 +265,13 @@ export default {
       try {
         console.log('Sending event to the server ...', eventData);
         // TODO: Should be const in configuration.
-        const response = await axios.post('/admin/openy/schedules/create-event', eventData);
+        let url;
+        if (eventData.id) {
+          url ='/admin/openy/schedules/update-event';
+        } else {
+          url = '/admin/openy/schedules/create-event';
+        }
+        const response = await axios.post(url, eventData);
         if (response.status === 200) {
           this.$emit('save', eventData);
           this.handleClose();
