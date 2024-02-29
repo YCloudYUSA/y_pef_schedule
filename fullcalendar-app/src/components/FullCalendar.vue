@@ -218,8 +218,8 @@ export default {
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
         calendarEvent.setProp('color', updatedEvent.colorEvent);
+        calendarEvent.setExtendedProp('colorEvent', updatedEvent.colorEvent);
       }
-
       // this.eventService.updateEventOnServer(updatedEvent);
     },
     addEvent(newEvent) {
@@ -228,6 +228,9 @@ export default {
     },
     addEventToCalendar(newEvent) {
       const calendarApi = this.$refs.fullCalendar.getApi();
+      newEvent.id = newEvent.nid + '-' + Math.random().toString(16).slice(2);
+      console.log(newEvent)
+
       calendarApi.addEvent(newEvent);
     },
     async handleWeekChange(payload) {
@@ -271,7 +274,8 @@ export default {
     },
     updateEvent(eventInfo) {
       const event = {
-        id: eventInfo.event.id,
+        id: eventInfo.event.extendedProps.nid,
+        nid: eventInfo.event.extendedProps.nid,
         startGlobal: combineDateTime(eventInfo.event.extendedProps.startGlobal, eventInfo.event.start),
         endGlobal: combineDateTime(eventInfo.event.extendedProps.endGlobal, eventInfo.event.end),
       };
@@ -318,6 +322,7 @@ export default {
 
       this.selectedEvent = {
         id: clickInfo.event.id,
+        nid: clickInfo.event.extendedProps.nid,
         title: clickInfo.event.title,
         start: clickInfo.event.start,
         end: clickInfo.event.end,

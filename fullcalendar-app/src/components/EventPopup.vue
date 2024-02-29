@@ -202,7 +202,6 @@ export default {
       deep: true,
       immediate: true,
       handler(newVal) {
-        console.log('start')
         this.event = {
           ...newVal,
           start: this.formatDateTimeLocal(newVal.start),
@@ -265,13 +264,18 @@ export default {
         console.log('Sending event to the server ...', eventData);
         // TODO: Should be const in configuration.
         let url;
-        if (eventData.id) {
+        if (eventData.nid) {
           url ='/admin/openy/schedules/update-event';
         } else {
           url = '/admin/openy/schedules/create-event';
         }
         const response = await axios.post(url, eventData);
         if (response.status === 200) {
+
+          if (response.data.id) {
+            eventData.nid = response.data.id;
+          }
+
           this.$emit('save', eventData);
           this.handleClose();
         }

@@ -20,7 +20,8 @@ export default class EventService {
     try {
       const response = await axios.get(url);
       return response.data.map(event => ({
-        id: event.nid,
+        id: event.nid + '-' + Math.random().toString(16).slice(2),
+        nid: event.nid,
         title: event.name,
         start: event.time_start_calendar,
         end: event.time_end_calendar,
