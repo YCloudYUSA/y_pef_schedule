@@ -87,6 +87,9 @@ export default {
           center: 'timeGridWeek,listDay',
           right: 'today,prev,next',
         },
+        views: {
+          listDay: { buttonText: 'day' },
+        },
         themeSystem : "bootstrap5",
         initialView: window.innerWidth > 992 ? 'timeGridWeek' : 'listDay',
         editable: true,
@@ -118,6 +121,18 @@ export default {
         eventDrop: this.updateEvent,
         eventResize: this.updateEvent,
         eventAllow: this.eventAllow,
+        dayHeaderContent: (args) => {
+          const dayOfWeekShort = args.date.toLocaleString('en-US', { weekday: 'short' });
+          const dayOfMonth = args.date.getDate();
+
+          return {
+            html: `
+                    <div class="day-header">
+                      ${dayOfWeekShort} <span>${dayOfMonth}</span>
+                    </div>
+                  `
+          };
+        },
       }
     };
   },

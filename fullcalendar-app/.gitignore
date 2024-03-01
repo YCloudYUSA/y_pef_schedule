@@ -1,7 +1,14 @@
+# Exclude hidden OS files.
 .DS_Store
-node_modules
-/dist
+._*
+Thumbs.db
 
+# Ignore Development tool files.
+.idea
+node_modules
+
+/public/favicon.ico
+/public/index.html
 
 # local env files
 .env.local
@@ -14,7 +21,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
-.idea
 .vscode
 *.suo
 *.ntvs*

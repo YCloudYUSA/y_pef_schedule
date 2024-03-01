@@ -147,7 +147,7 @@ export default {
   top: 50%;
   width: 5px;
   height: 10px;
-  border: solid white;
+  border: solid black;
   border-width: 0 2px 2px 0;
   transform: translate(-50%, -50%) rotate(45deg);
 }

@@ -6,6 +6,7 @@ y_pef_schedule-app:
   css:
     theme:
       assets/css/custom-calendar-styles.css: {}
+      fullcalendar-app/dist/fullcalendar-app.css: {}
   dependencies:
     - y_pef_schedule/vue3
     - y_pef_schedule/vue3.vuex

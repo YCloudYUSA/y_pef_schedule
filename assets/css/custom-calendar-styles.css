@@ -5,6 +5,10 @@
 #fullcalendar-app table {
   margin-top: 0 !important;
 }
+#fullcalendar-app th.fc-col-header-cell {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
 
 /* PDF BUTTON STYLES */
 .download-pdf-button {
@@ -38,4 +42,25 @@
 .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
   margin-left: auto;
   margin-right: 30px;
+}
+.day-header {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+}
+
+.day-header span {
+  background-color: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.fc-timegrid-event .fc-event-main {
+  line-height: 1.2;
 }

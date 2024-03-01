@@ -10,7 +10,6 @@ use Drupal\node\NodeInterface;
 use Drupal\paragraphs\Entity\Paragraph;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Handles calendar views and event management for the FullCalendar integration.
@@ -36,6 +35,7 @@ class FullCalendarController extends ControllerBase {
       '#attached' => [
         'library' => [
           'y_pef_schedule/custom-calendar-styles',
+          'y_pef_schedule/y_pef_schedule-app',
         ],
       ],
     ];
@@ -249,7 +249,6 @@ class FullCalendarController extends ControllerBase {
     $query->condition('n.status', NodeInterface::PUBLISHED);
     $query->condition('n.type', 'activity');
     $query->orderBy('n.title');
-    $query->range(0, 6);
     $result = $query->execute();
 
     $categories = [];
