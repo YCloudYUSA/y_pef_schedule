@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <button class="legend-toggle-button btn btn-primary" @click="toggleLegend">Legend +</button>
+    <button class="legend-toggle-button btn btn-dark" data-mdb-ripple-init @click="toggleLegend">Legend +</button>
     <div :class="['checkbox-container', { active: isLegendOpen }]">
       <label class="custom-checkbox" v-for="category in categories" :key="category.name">
         <input

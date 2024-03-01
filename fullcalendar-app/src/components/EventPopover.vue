@@ -27,7 +27,7 @@
 
     </div>
     <div class="card-footer text-right">
-      <button type="button" class="btn btn-primary" @click="editEvent">Edit</button>
+      <button type="button" class="btn btn-secondary" @click="editEvent">Edit</button>
     </div>
   </div>
 </template>
@@ -92,6 +92,7 @@ hr {
 }
 
 .event-popover .card-title {
-  padding-right: 10px;
+  padding-right: 30px;
+  padding-bottom: 10px;
 }
 </style>

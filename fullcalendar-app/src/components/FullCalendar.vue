@@ -176,7 +176,24 @@ export default {
       clone.style.marginTop = '10px';
       clone.style.marginLeft = '25px';
       clone.style.marginRight = '25px';
-      clone.querySelectorAll('.download-pdf-button').forEach(function(element) {
+
+      const calendarBranchHeader = clone.querySelectorAll('.calendar-branch-header')[0];
+      if (calendarBranchHeader.length) {
+        calendarBranchHeader.style.padding = '0';
+        calendarBranchHeader.style.fontSize = '10px';
+        calendarBranchHeader.style.position = 'absolute';
+        calendarBranchHeader.style.right = '30px';
+      }
+
+      if (clone.querySelectorAll('.fc-listDay-view').length) {
+        clone.querySelectorAll('.fc-listDay-view')[0].style.position = 'relative';
+        clone.querySelectorAll('.fc-listDay-view table')[0].style.marginBottom = '0';
+        clone.querySelectorAll('.fc-listDay-view tbody td').forEach(function(element) {
+          element.style.height = '3rem';
+        });
+      }
+
+      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4').forEach(function(element) {
         element.style.display = 'none';
       });
 
@@ -185,9 +202,9 @@ export default {
 
       // Setting parameters for html2pdf.
       const options = {
-        margin: [5, 5],
+        margin: [3, 5],
         filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 0.99 },
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: {
           unit: 'mm',
@@ -357,6 +374,7 @@ export default {
         start: clickInfo.event.start,
         end: clickInfo.event.end,
         room: clickInfo.event.extendedProps.room,
+        // colorEvent: clickInfo.event.extendedProps.colorEvent,
         colorEvent: clickInfo.event.extendedProps.colorEvent,
         instructor: clickInfo.event.extendedProps.instructor,
         description: clickInfo.event.extendedProps.description,

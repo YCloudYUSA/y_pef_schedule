@@ -1,9 +1,9 @@
 <template>
-  <div class="modal-backdrop" v-click-outside="handleClose" @click="handleBackdropClick">
+  <div class="fc-modal-event modal-backdrop" v-click-outside="handleClose" @click="handleBackdropClick">
     <div class="modal fade show" tabindex="-1" role="dialog" style="display: block; padding-right: 17px;">
       <div class="modal-dialog modal-dialog-centered" role="document" @click.stop>
         <div class="modal-content border-0 shadow-lg rounded-lg">
-          <div class="modal-header bg-primary text-white rounded-top">
+          <div class="modal-header bg-secondary text-white">
             <h5 class="modal-title">{{this.event.label}} event</h5>
             <button type="button" class="close text-white" @click="handleClose">
               <span aria-hidden="true">&times;</span>
@@ -84,8 +84,10 @@
 .modal-dialog {
   max-width: 500px;
 }
-.modal-header {
+.fc-modal-event .modal-header {
   border-bottom: none;
+  border-top-left-radius: unset;
+  border-top-right-radius: unset;
 }
 .modal-body {
   padding: 1.5rem;
