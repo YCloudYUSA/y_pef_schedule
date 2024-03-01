@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <button class="legend-toggle-button" @click="toggleLegend">Legend +</button>
+    <button class="legend-toggle-button btn btn-primary" @click="toggleLegend">Legend +</button>
     <div :class="['checkbox-container', { active: isLegendOpen }]">
       <label class="custom-checkbox" v-for="category in categories" :key="category.name">
         <input
@@ -154,25 +154,24 @@ export default {
 
 /* MOBILE DEVICES */
 @media (max-width: 768px) {
-  .legend-toggle-button {
-    display: block;
-  }
-  .checkbox-container {
-    display: none;
-  }
-  .checkbox-container.active {
-    display: flex;
-  }
+
 }
 
 /* DESKTOP */
 @media (min-width: 768px) {
-  .legend-toggle-button {
-    display: none;
-  }
-  .checkbox-container {
-    display: flex;
-  }
+
+}
+.legend-toggle-button {
+  display: block;
+}
+.checkbox-container {
+  display: none;
+}
+.checkbox-container.active {
+  display: flex;
+  margin-top: 20px;
+  gap: 3px;
+  justify-content: flex-end;
 }
 
 .calendar-branch-header {
