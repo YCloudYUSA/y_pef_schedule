@@ -1,11 +1,17 @@
 <template>
+  <div class="calendar-branch-header">
+    <div class="calendar-branch-info" v-if="branch">
+      <h4>{{ 'Branch name' }}</h4>
+      <h2>{{ branch }}</h2>
+    </div>
+  </div>
+
   <div class="fullcalendar--header">
     <div class="pdf">
       <button class="download-pdf-button" @click="$emit('downloadPDF')">
         <i class="bi bi-download"></i>
         Download PDF
       </button>
-
     </div>
 
     <button class="legend-toggle-button" @click="toggleLegend">Legend +</button>
@@ -26,6 +32,8 @@
 </template>
 
 <script>
+import EventService from '../service/EventService';
+
 export default {
   name: 'CalendarHeader',
   props: {
@@ -35,7 +43,12 @@ export default {
   data() {
     return {
       isLegendOpen: false,
+      branch: null,
     };
+  },
+  mounted() {
+    const eventService = new EventService();
+    this.branch = eventService.getBranch();
   },
   methods: {
     toggleLegend() {
@@ -160,5 +173,31 @@ export default {
   .checkbox-container {
     display: flex;
   }
+}
+
+.calendar-branch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.calendar-branch-header .calendar-branch-info {
+  text-align: left;
+}
+
+.calendar-branch-header .calendar-branch-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.calendar-branch-header .calendar-branch-info h2 {
+  margin: 0;
+  font-weight: bold;
+  color: #000;
 }
 </style>

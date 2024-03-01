@@ -54,6 +54,9 @@ import axios from 'axios';
 import html2pdf from 'html2pdf.js';
 
 
+import dayGridPlugin from '@fullcalendar/daygrid'
+import listPlugin from '@fullcalendar/list'
+
 export default {
   name: 'EventsFullCalendar',
   components: {
@@ -74,10 +77,18 @@ export default {
         plugins: [
           interactionPlugin,
           timeGridPlugin,
-          bootstrap5Plugin
+          bootstrap5Plugin,
+
+          dayGridPlugin,
+          listPlugin,
         ],
+        headerToolbar: {
+          left: 'title',
+          center: 'timeGridWeek,listDay',
+          right: 'today,prev,next',
+        },
         themeSystem : "bootstrap5",
-        initialView: window.innerWidth > 768 ? 'timeGridWeek' : 'timeGridDay',
+        initialView: window.innerWidth > 992 ? 'timeGridWeek' : 'listDay',
         editable: true,
         eventResizableFromStart: false,
         selectable: true,
@@ -147,8 +158,10 @@ export default {
 
       // Setting styles for copy.
       clone.style.padding = '0';
-      clone.style.margin = '0';
-      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar').forEach(function(element) {
+      clone.style.marginTop = '10px';
+      clone.style.marginLeft = '25px';
+      clone.style.marginRight = '25px';
+      clone.querySelectorAll('.download-pdf-button').forEach(function(element) {
         element.style.display = 'none';
       });
 
@@ -171,11 +184,13 @@ export default {
 
       // Generate PDF from copy.
       html2pdf().from(clone).set(options).toPdf().get('pdf').then(function (pdf) {
-        document.body.removeChild(clone); // Removing a copy from the DOM after creating a PDF.
+        // Removing a copy from the DOM after creating a PDF.
+        document.body.removeChild(clone);
         pdf.save(options.filename);
       }).catch(function(error) {
-        console.error('Помилка при створенні PDF:', error);
-        document.body.removeChild(clone); // Make sure the copy is deleted even in case of error.
+        console.error('Error creating PDF:', error);
+        // Make sure the copy is deleted even in case of error.
+        document.body.removeChild(clone);
       });
     },
     openPopup(type) { this.activeModal = type; },

@@ -142,9 +142,11 @@ class RepeatScheduleController extends RepeatController {
       $time_end->setTimestamp($item->end_timestamp);
       $time_end->setTimezone($tz);
       $tzUtc = new \DateTimeZone('UTC');
+
       $time_start_calendar_global = new \DateTime($item->time_start_calendar_global, $tzUtc);
       $time_start_calendar_global->setTimezone($tz);
-    $time_end_calendar_global = new \DateTime($item->time_end_calendar_global, $tzUtc);
+
+      $time_end_calendar_global = new \DateTime($item->time_end_calendar_global, $tzUtc);
       $time_end_calendar_global->setTimezone($tz);
 
       $result[$key]->time_start_calendar_global = $time_start_calendar_global->format('Y-m-d H:i:s');
