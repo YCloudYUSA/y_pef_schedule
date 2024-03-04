@@ -56,43 +56,43 @@ export default {
 };
 </script>
 
-<style scoped>
-.event-popover {
-  position: absolute;
-  z-index: 100;
-  width: auto;
-  max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+<style lang="scss">
+.fullcalendar-app {
+  .event-popover {
+    position: absolute;
+    z-index: 100;
+    width: auto;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
-button.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-}
-hr {
-  margin: 0.3rem;
-}
-.card-body {
-  text-align: left;
-}
+    .card-title {
+      padding-right: 30px;
+      padding-bottom: 10px;
+    }
+  }
 
-.card-text {
-  margin-bottom: 0.5rem;
-}
-.card-header {
-  display: flex;
-  justify-content: space-between;
-}
+  button.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+  }
 
-.card-footer {
-  padding: 0.75rem 1.25rem;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-}
+  hr {
+    margin: 0.3rem;
+  }
 
-.event-popover .card-title {
-  padding-right: 30px;
-  padding-bottom: 10px;
+  .card-body {
+    text-align: left;
+  }
+
+  .card-text {
+    margin-bottom: 0.5rem;
+  }
+
+  .card-footer {
+    padding: 0.75rem 1.25rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
 }
 </style>

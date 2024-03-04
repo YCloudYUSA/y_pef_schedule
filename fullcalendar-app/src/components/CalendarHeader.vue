@@ -79,124 +79,110 @@ export default {
   }
 };
 </script>
-<style scoped>
-.fullcalendar--header {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 30px 0;
-}
 
-.checkbox-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-.custom-checkbox {
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding-left: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  user-select: none;
-  margin-right: 15px;
-}
+<style lang="scss">
+.fullcalendar-app {
+  .fullcalendar--header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 30px 0;
+  }
 
-.custom-checkbox input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
+  .checkbox-container {
+    display: none;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    gap: 3px;
+    justify-content: flex-end;
 
-.checkmark {
-  position: absolute;
-  left: 0;
-  height: 17px;
-  width: 17px;
-  background-color: #eee;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
+    &.active {
+      display: flex;
+    }
+  }
 
-.custom-checkbox:hover input ~ .checkmark {
-  background-color: #ccc;
-}
+  .custom-checkbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    margin-right: 15px;
 
-.custom-checkbox input:checked ~ .checkmark {
-  background-color: #2196F3;
-  border: 1px solid #2196F3;
-}
+    input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
 
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
+    .checkmark {
+      position: absolute;
+      left: 0;
+      height: 17px;
+      width: 17px;
+      background-color: #eee;
+      border-radius: 4px;
+      border: 1px solid #ddd;
 
-.custom-checkbox input:checked ~ .checkmark:after {
-  display: block;
-}
+      &:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 50%;
+        top: 50%;
+        width: 5px;
+        height: 10px;
+        border: solid black;
+        border-width: 0 2px 2px 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
 
-.custom-checkbox .checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-  left: 50%;
-  top: 50%;
-  width: 5px;
-  height: 10px;
-  border: solid black;
-  border-width: 0 2px 2px 0;
-  transform: translate(-50%, -50%) rotate(45deg);
-}
+    &:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
 
-/* MOBILE DEVICES */
-@media (max-width: 768px) {
+    input:checked ~ .checkmark {
+      background-color: #2196F3;
+      border: 1px solid #2196F3;
+      &:after {
+        display: block;
+      }
+    }
+  }
 
-}
+  .legend-toggle-button {
+    display: block;
+  }
 
-/* DESKTOP */
-@media (min-width: 768px) {
+  .calendar-branch-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
 
-}
-.legend-toggle-button {
-  display: block;
-}
-.checkbox-container {
-  display: none;
-}
-.checkbox-container.active {
-  display: flex;
-  margin-top: 20px;
-  gap: 3px;
-  justify-content: flex-end;
-}
+    .calendar-branch-info {
+      text-align: left;
 
-.calendar-branch-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-}
+      h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
 
-.calendar-branch-header .calendar-branch-info {
-  text-align: left;
-}
-
-.calendar-branch-header .calendar-branch-info h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #000;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.calendar-branch-header .calendar-branch-info h2 {
-  margin: 0;
-  font-weight: bold;
-  color: #000;
+      h2 {
+        margin: 0;
+        font-weight: bold;
+        color: #000;
+      }
+    }
+  }
 }
 </style>

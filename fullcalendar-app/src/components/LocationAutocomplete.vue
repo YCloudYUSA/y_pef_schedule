@@ -21,23 +21,29 @@
   </div>
 </template>
 
-<style scoped>
-.autocomplete ul {
-  position: absolute;
-  z-index: 1000;
-  background-color: white;
-  list-style-type: none;
-  width: 100%;
-  border: 1px solid #ccc;
-  margin: 0;
-  padding-left: 0;
-}
-.autocomplete li {
-  padding: 5px;
-  cursor: pointer;
-}
-.autocomplete li:hover {
-  background-color: #eee;
+<style lang="scss">
+.fullcalendar-app {
+  .autocomplete {
+    ul {
+      position: absolute;
+      z-index: 1000;
+      background-color: white;
+      list-style-type: none;
+      width: 100%;
+      border: 1px solid #ccc;
+      margin: 0;
+      padding-left: 0;
+    }
+
+    li {
+      padding: 5px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
 }
 </style>
 

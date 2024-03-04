@@ -1,8 +1,18 @@
 y_pef_schedule.branches:
-  path: '/admin/openy/schedules'
+  path: '/admin/openy/branch-schedules'
   defaults:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branchesListPage'
     _title: 'Branches'
+  requirements:
+    _permission: 'access administration pages'
+
+y_pef_schedule.fullcalendar:
+  path: '/admin/openy/branch-schedules/{branch}/{start_date}'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::calendarView'
+    _title: 'Schedules'
+    branch: ''
+    start_date: '0'
   requirements:
     _permission: 'access administration pages'
 
@@ -23,7 +33,7 @@ y_pef_schedule.classes_options:
     _permission: 'access administration pages'
 
 y_pef_schedule.create_event:
-  path: '/admin/openy/schedules/create-event'
+  path: '/admin/openy/branch-schedules/create-event'
   defaults:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::createEvent'
     _title: 'Create event'
@@ -31,21 +41,10 @@ y_pef_schedule.create_event:
     _permission: 'access administration pages'
 
 y_pef_schedule.update_event:
-  path: '/admin/openy/schedules/update-event'
+  path: '/admin/openy/branch-schedules/update-event'
   defaults:
     _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::updateEvent'
     _title: 'Update event'
-  requirements:
-    _permission: 'access administration pages'
-
-
-y_pef_schedule.fullcalendar:
-  path: '/admin/openy/schedules/{branch}/{start_date}'
-  defaults:
-    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::calendarView'
-    _title: 'Schedules'
-    branch: ''
-    start_date: '0'
   requirements:
     _permission: 'access administration pages'
 

@@ -71,97 +71,8 @@
     </div>
   </div>
 </template>
-<style scoped>
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1050;
-}
-.modal-dialog {
-  max-width: 500px;
-}
-.fc-modal-event .modal-header {
-  border-bottom: none;
-  border-top-left-radius: unset;
-  border-top-right-radius: unset;
-}
-.modal-body {
-  padding: 1.5rem;
-}
-.form-compact textarea {
-  resize: none;
-}
-@media (max-width: 576px) {
-  .modal-dialog {
-    margin: 1.5rem auto;
-  }
-}
-.day-selector {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-.day-selector h5 {
-  grid-column: span 2;
-  margin-top: 0;
-}
-.form-check {
-  display: flex;
-  align-items: center;
-}
-.form-check-input {
-  margin-right: 0.5rem;
-  cursor: pointer;
-}
-.form-check-label {
-  cursor: pointer;
-  padding-left: 25px;
-}
-.btn-success {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
-}
-.btn-success:hover {
-  background-color: #45a049;
-}
-.form-check-input {
-  appearance: none;
-  background-color: #fff;
-  margin: 0;
-  font: inherit;
-  color: currentColor;
-  width: 1.15em;
-  height: 1.15em;
-  border: 0.1em solid rgba(0, 0, 0, 0.25);
-  border-radius: 0.15em;
-  transform: translateY(-0.075em);
-  display: grid;
-  place-content: center;
-}
-.form-check-input:checked {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-.form-check-input:checked::before {
-  content: "";
-  width: 0.65em;
-  height: 0.65em;
-  clip-path: polygon(14% 44%, 50% 80%, 86% 21%, 77% 14%, 50% 68%, 21% 35%);
-  transform: scale(1.2);
-  background-color: #fff;
-}
-</style>
-<script>
 
+<script>
 import axios from 'axios';
 import Select2 from 'vue3-select2-component';
 import {object} from "yup";
@@ -268,9 +179,9 @@ export default {
         // TODO: Should be const in configuration.
         let url;
         if (eventData.nid) {
-          url ='/admin/openy/schedules/update-event';
+          url ='/admin/openy/branch-schedules/update-event';
         } else {
-          url = '/admin/openy/schedules/create-event';
+          url = '/admin/openy/branch-schedules/create-event';
         }
         const response = await axios.post(url, eventData);
         if (response.status === 200) {
@@ -316,3 +227,112 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.fullcalendar-app {
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+  }
+
+  .modal-dialog {
+    max-width: 500px;
+    margin: 1.5rem auto;
+
+    @media (min-width: 576px) {
+      margin: 30px auto;
+    }
+  }
+
+  .fc-modal-event {
+    .modal-header {
+      border-bottom: none;
+      border-top-left-radius: unset;
+      border-top-right-radius: unset;
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .form-compact {
+    textarea {
+      resize: none;
+    }
+  }
+
+  .day-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+
+    h5 {
+      grid-column: span 2;
+      margin-top: 0;
+    }
+  }
+
+  .form-check {
+    display: flex;
+    align-items: center;
+
+    &-input {
+      $check-border: rgba(0, 0, 0, 0.25);
+
+      cursor: pointer;
+      appearance: none;
+      background-color: #fff;
+      margin: 0;
+      font: inherit;
+      color: currentColor;
+      width: 1.15em;
+      height: 1.15em;
+      border: 0.1em solid $check-border;
+      border-radius: 0.15em;
+      transform: translateY(-0.075em);
+      display: grid;
+      place-content: center;
+
+      &:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+
+        &::before {
+          content: "";
+          width: 0.65em;
+          height: 0.65em;
+          clip-path: polygon(14% 44%, 50% 80%, 86% 21%, 77% 14%, 50% 68%, 21% 35%);
+          transform: scale(1.2);
+          background-color: #fff;
+        }
+      }
+    }
+
+    &-label {
+      cursor: pointer;
+      padding-left: 25px;
+    }
+  }
+
+  .btn-success {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+}
+</style>

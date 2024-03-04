@@ -31,7 +31,10 @@ class FullCalendarController extends ControllerBase {
     $build = [
       '#type' => 'html_tag',
       '#tag' => 'div',
-      '#attributes' => ['id' => 'fullcalendar-app'],
+      '#attributes' => [
+        'id' => 'fullcalendar-app',
+        'class' => ['fullcalendar-app'],
+      ],
       '#attached' => [
         'library' => [
           'y_pef_schedule/custom-calendar-styles',
