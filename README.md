@@ -1,30 +1,28 @@
-# Y PEF Schedules tools
+# Y PEF Schedule
 
-The Y PEF Schedule module provides a calendar functionality for scheduling events. It includes a Vue.js component, `fullcalendar-app`, to display and interact with the calendar.
+The Y PEF Schedule module provides a calendar functionality for scheduling events.
+It includes a Vue.js component, `fullcalendar-app`, to display and interact with the calendar.
 
 ## Installation
 
 1. Download and install the module in your Drupal project.
 2. Enable the module by navigating to `Admin > Extend` in your Drupal admin interface.
+3. Go to the `/admin/openy/branch-schedules` and select a branch.
 
 ## Usage
+After choosing a brunch, you can view the calendar, the main features of the calendar:
+1. View events in weekly or daily format
+2. Viewing the main information of the event (clicking on the event)
+3. Creating a new event (content type session)
+4. Update of existing events
+5. Downloading the schedule in PDF format
+6. Filtering results by categories
 
-### Displaying the Calendar
+### Issues or things worth knowing (TUDUS):
+1. After creating a series of events, it is created, but only one event is displayed in the calendar, the page must be refreshed to see the correct data
+2. The color is fixed to the session and not to the category
+3. PDF format is A3
 
-To display the calendar, create a new page and use the provided controller:
-
-```php
-public function content() {
-  return [
-    '#theme' => 'y_pef_schedule_calendar',
-    '#attached' => [
-      'library' => [
-        'y_pef_schedule/fullcalendar-app',
-      ],
-    ],
-  ];
-}
-```
 ### Retrieving Events
 The module provides controllers to handle AJAX requests for fetching events. Use the following route in your JavaScript code:
 
@@ -46,13 +44,9 @@ The fullcalendar-app component allows users to create events interactively. When
 To customize the form or extend the functionality, refer to the Vue.js component documentation and customize the handleDateClick and createEvent methods in the fullcalendar-app component.
 
 ### Requirements
-Drupal 9
-Vue.js
-Axios
-FullCalendar
-vue2-timepicker
-vuejs-datepicker
-
-
-bootstrap-vue - not supported for vue3, @vue/compat - aka migration build not the best solution, it requires bootstrap 4
+* Drupal 9
+* Open Y Repeat
+* Vue.js 3
+* Axios
+* FullCalendar
 
