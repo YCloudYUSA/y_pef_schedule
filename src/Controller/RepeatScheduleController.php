@@ -2,6 +2,7 @@
 
 namespace Drupal\y_pef_schedule\Controller;
 
+use DateTimeZone;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\openy_repeat\Controller\RepeatController;
@@ -36,73 +37,27 @@ class RepeatScheduleController extends RepeatController {
    */
   public function getDateRangeData($request, $location, $start_date, $end_date, $categories) {
     $query = $this->database->select('repeat_event', 're');
-    $query->leftJoin('node', 'n', 're.session = n.nid');
-    $query->innerJoin('node_field_data', 'nd', 're.location = nd.nid');
-    $query->innerJoin('node_field_data', 'nds', 'n.nid = nds.nid');
-    $query->leftJoin('node__field_session_color', 'nfc', 'n.nid = nfc.entity_id');
-    $query->leftJoin('node__field_session_description', 'nfd', 'n.nid = nfd.entity_id');
-    $query->addField('n', 'nid');
-    $query->addField('nd', 'title', 'location');
-    $query->addField('nds', 'title', 'name');
-    $query->fields('re', [
-      'class',
-      'session',
-      'room',
-      'instructor',
-      'category',
-      'register_url',
-      'register_text',
-      'duration',
-      'productid',
-      'weekday',
-    ]);
-
-    $subquery = $this->database->select('node__field_session_time', 'nft');
-    $subquery->innerJoin('paragraph__field_session_time_days', 'ptd', 'ptd.entity_id = nft.field_session_time_target_id');
-    $subquery->innerJoin('paragraph__field_session_time_date', 'psd', 'psd.entity_id = nft.field_session_time_target_id');
-    $subquery->addField('nft', 'entity_id', 'id');
-    $subquery->addField('psd', 'field_session_time_date_value', 'start_date');
-    $subquery->addField('psd', 'field_session_time_date_end_value', 'end_date');
-    $subquery->addExpression('GROUP_CONCAT(ptd.field_session_time_days_value)', 'days');
-    $subquery->groupBy('nft.field_session_time_target_id');
-    $query->leftJoin($subquery, 'sq', 're.session = sq.id');
-
-    $query->addField('sq', 'days');
-    $query->addField('sq', 'start_date', 'time_start_calendar_global');
-    $query->addField('sq', 'end_date', 'time_end_calendar_global');
-    $query->addField('nfc', 'field_session_color_value', 'color');
-    $query->addField('nfd', 'field_session_description_value', 'description');
-    $query->addField('re', 'start', 'start_timestamp');
-    $query->addField('re', 'end', 'end_timestamp');
-    // Query conditions.
-//    $query->distinct();
-
-    $query->condition('re.start', $this->converUnixTime($end_date), '<=');
-    $query->condition('re.end',  $this->converUnixTime($start_date), '>=');
-
-    if (!empty($categories)) {
-      $query->condition('re.category', explode(',', $categories), 'IN');
-    }
-    if (!empty($location)) {
-      $query->condition('nd.title', explode(';', rawurldecode($location)), 'IN');
-    }
-    $exclusions = $request->get('excl');
-    if (!empty($exclusions)) {
-      $query->condition('re.category', explode(';', $exclusions), 'NOT IN');
-    }
-    $limit = $request->get('limit');
-    if (!empty($limit)) {
-      $query->condition('re.category', explode(';', $limit), 'IN');
-    }
-    if (!empty($instructor)) {
-      $query->condition('re.instructor', $instructor);
-    }
-    if (!empty($class)) {
-      $query->condition('re.class', $class);
-    }
+    $this->joinTables($query);
+    $this->addFields($query);
+    $this->addCondition($query, $start_date, $end_date, $categories, $location, $request);
     $result = $query->execute()->fetchAll();
 
-    $week = $this->getWeekDate($start_date);
+    return $this->proccessResult($result, $this->getWeekDate($start_date));
+  }
+
+  /**
+   * @param array $result
+   *   Result from database query
+   * @param array $week
+   *   Date of the searching week.
+   *
+   * @return array
+   *   Result events.
+   *
+   * @throws \Exception
+   */
+  protected function proccessResult($result, $week) {
+
     $locations_info = $this->getLocationsInfo();
 
     $classesIds = [];
@@ -125,63 +80,129 @@ class RepeatScheduleController extends RepeatController {
         }
       }
 
-      if (!empty($item->description)) {
-        $result[$key]->description = strip_tags($item->description);
-      }
-
+      $result[$key]->description = strip_tags($item->description ?? '');
       $result[$key]->class_info = $classes_info[$item->class];
 
-      $result[$key]->time_start_sort = $this->dateFormatter->format((int) $item->start_timestamp, 'custom', 'Hi');
+      $tz_default = new \DateTimeZone(date_default_timezone_get());
+      $tz_utc = new \DateTimeZone('UTC');
 
-      $tz = new \DateTimeZone(date_default_timezone_get());
-      // Convert timezones for start_time and end_time.
-      $time_start = new \DateTime();
-      $time_start->setTimestamp($item->start_timestamp);
-      $time_start->setTimezone($tz);
-      $time_end = new \DateTime();
-      $time_end->setTimestamp($item->end_timestamp);
-      $time_end->setTimezone($tz);
-      $tzUtc = new \DateTimeZone('UTC');
-
-      $time_start_calendar_global = new \DateTime($item->time_start_calendar_global, $tzUtc);
-      $time_start_calendar_global->setTimezone($tz);
-
-      $time_end_calendar_global = new \DateTime($item->time_end_calendar_global, $tzUtc);
-      $time_end_calendar_global->setTimezone($tz);
-
-      $result[$key]->time_start_calendar_global = $time_start_calendar_global->format('Y-m-d H:i:s');
-      $result[$key]->time_end_calendar_global = $time_end_calendar_global->format('Y-m-d H:i:s');
-
-      $result[$key]->time_start = $time_start->format('g:iA');
-      $result[$key]->time_end = $time_end->format('g:iA');
-
-      // Example of calendar format 2018-08-21 14:15:00.
-      $result[$key]->time_start_calendar = $week[$item->weekday] . ' ' . $this->dateFormatter->format((int) $item->start_timestamp, 'custom', 'H:i:s');
-      $result[$key]->time_end_calendar = $week[$item->weekday] . ' ' . $this->dateFormatter->format((int) $item->start_timestamp + $item->duration * 60, 'custom', 'H:i:s');
+      $result[$key]->time_start_calendar_global = $this->convertDate($item->time_start_calendar_global, $tz_utc, $tz_default, 'Y-m-d H:i:s');
+      $result[$key]->time_end_calendar_global = $this->convertDate($item->time_end_calendar_global, $tz_utc, $tz_default, 'Y-m-d H:i:s');
+      $result[$key]->time_start = $this->convertDate($item->start, $tz_utc, $tz_default, 'g:iA');
+      $result[$key]->time_end = $this->convertDate($item->end, $tz_utc, $tz_default, 'g:iA');
+      $result[$key]->time_start_calendar = $week[$item->weekday] . ' ' . $this->convertDate($item->start, $tz_utc, $tz_default, 'H:i:s');
+      $result[$key]->time_end_calendar = $week[$item->weekday] . ' ' . $this->convertDate($item->start + $item->duration * 60, $tz_utc, $tz_default, 'H:i:s');
       $result[$key]->timezone = date_default_timezone_get();
-
-      // Durations.
-      $result[$key]->duration_minutes = $item->duration % 60;
-      $result[$key]->duration_hours = ($item->duration - $result[$key]->duration_minutes) / 60;
     }
-
-    usort($result, function ($item1, $item2) {
-      if ((int) $item1->time_start_sort == (int) $item2->time_start_sort) {
-        return 0;
-      }
-      return (int) $item1->time_start_sort < (int) $item2->time_start_sort ? -1 : 1;
-    });
 
     return $result;
   }
 
-  protected function converUnixTime($datetime) {
-    $tz =\Drupal::configFactory()->get('system.date')->get('timezone')['default'];
-    $date_obj = new DrupalDateTime($datetime, $tz);
-    $r = $date_obj->format('U', ['timezone'=>  $tz]);
-    return $r;
+  /**
+   * Join table to query
+   *
+   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   *   Select Query object.
+   * @return void
+   */
+  protected function joinTables(&$query): void {
+    $query->leftJoin('node', 'n', 're.session = n.nid');
+    $query->innerJoin('node_field_data', 'nd', 're.location = nd.nid');
+    $query->innerJoin('node_field_data', 'nds', 'n.nid = nds.nid');
+    $query->leftJoin('node__field_session_color', 'nfc', 'n.nid = nfc.entity_id');
+    $query->leftJoin('node__field_session_description', 'nfd', 'n.nid = nfd.entity_id');
+    $this->addSubjoin($query);
   }
 
+  /**
+   * Add subjoin to query
+   *
+   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   *   Select Query object.
+   * @return void
+   */
+  protected function addSubjoin($query): void {
+    $subquery = $this->database->select('node__field_session_time', 'nft');
+    $subquery->innerJoin('paragraph__field_session_time_days', 'ptd', 'ptd.entity_id = nft.field_session_time_target_id');
+    $subquery->innerJoin('paragraph__field_session_time_date', 'psd', 'psd.entity_id = nft.field_session_time_target_id');
+    $subquery->addField('nft', 'entity_id', 'id');
+    $subquery->addField('psd', 'field_session_time_date_value', 'start_date');
+    $subquery->addField('psd', 'field_session_time_date_end_value', 'end_date');
+    $subquery->addExpression('GROUP_CONCAT(ptd.field_session_time_days_value)', 'days');
+    $subquery->groupBy('nft.field_session_time_target_id');
+    $query->leftJoin($subquery, 'sq', 're.session = sq.id');
+  }
+
+  /**
+   * Select fields.
+   *
+   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   *   Select Query object.
+   * @return void
+   */
+  protected function addFields(&$query) {
+    $query->addField('n', 'nid');
+    $query->addField('nd', 'title', 'location');
+    $query->addField('nds', 'title', 'name');
+    $query->addField('sq', 'days');
+    $query->addField('sq', 'start_date', 'time_start_calendar_global');
+    $query->addField('sq', 'end_date', 'time_end_calendar_global');
+    $query->addField('nfc', 'field_session_color_value', 'color');
+    $query->addField('nfd', 'field_session_description_value', 'description');
+    $query->fields('re', [
+      'class',
+      'session',
+      'room',
+      'instructor',
+      'category',
+      'register_url',
+      'register_text',
+      'duration',
+      'productid',
+      'weekday',
+      'start',
+      'end',
+    ]);
+  }
+
+  /**
+   * Add condition to query
+   *
+   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   *   Select Query object.
+   * @return void
+   */
+  protected function addCondition(&$query, $start_date, $end_date, $categories, $location, $request) {
+    $tz_default = new \DateTimeZone(date_default_timezone_get());
+    $tz_utc = new \DateTimeZone('UTC');
+    $query->condition('re.start', $this->convertDate($end_date, $tz_default, $tz_utc, 'U'), '<=');
+    $query->condition('re.end', $this->convertDate($start_date, $tz_default, $tz_utc, 'U'), '>=');
+
+    if (!empty($categories)) {
+      $query->condition('re.category', explode(',', $categories), 'IN');
+    }
+
+    if (!empty($location)) {
+      $query->condition('nd.title', explode(';', rawurldecode($location)), 'IN');
+    }
+
+    $exclusions = $request->get('excl');
+    if (!empty($exclusions)) {
+      $query->condition('re.category', explode(';', $exclusions), 'NOT IN');
+    }
+
+    $limit = $request->get('limit');
+    if (!empty($limit)) {
+      $query->condition('re.category', explode(';', $limit), 'IN');
+    }
+  }
+
+  /**
+   * @param string $start
+   *    Start date.
+   * @return array
+   *   Days of the week from start date
+   */
   protected function getWeekDate($start) {
     $week = [];
     $tz = \Drupal::configFactory()->get('system.date')->get('timezone')['default'];
@@ -196,4 +217,33 @@ class RepeatScheduleController extends RepeatController {
     }
     return $week;
   }
+
+  /**
+   * Convert date to user format and change timezone.
+   *
+   * @param string $date
+   *    Date iso format or unix time
+   * @param DateTimeZone $tzFrom
+   *   Convert from Timezone
+   * @param DateTimeZone $tzTo
+   *   Convert to Timezone
+   * @param string $format
+   *   Format date
+   * @return string
+   *   Date format
+   * @throws \Exception
+   */
+  protected function convertDate($date, $tzFrom, $tzTo, $format) {
+    if (is_numeric($date)) {
+      $date_object = new \DateTime();
+      $date_object->setTimestamp($date);
+    }
+    else {
+      $date_object = new \DateTime($date, $tzFrom);
+    }
+
+    $date_object->setTimezone($tzTo);
+    return $date_object->format($format);
+  }
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\y_pef_schedule\Controller;
 
@@ -68,38 +68,15 @@ class FullCalendarController extends ControllerBase {
    * @return JsonResponse
    */
   public function updateEvent(Request $request): JsonResponse {
-    // TODO: Will be good to reuse code from the \Drupal\openy_daxko_gxp_syncer\syncer\SessionManager::updateSession
-    $event = $request->toArray();
+    $event_data = $request->toArray();
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');
     /** @var \Drupal\node\NodeInterface $node */
-    $node = $node_storage->load($event['nid']);
-
-    $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
-    $time_paragraph = $paragraph_storage->load($node->field_session_time->target_id);
-    $time_paragraph->set('field_session_time_date',
-      [
-        'value' => $this->convertDate($event['startGlobal']),
-        'end_value' => $this->convertDate($event['endGlobal']),
-      ]
-    );
-    if ($event["days"]){
-      $time_paragraph->set('field_session_time_days', explode(',', $event["days"]));
+    $node = $node_storage->load($event_data['nid']);
+    if ($event_data['title']) {
+      $node->setTitle($event_data['title']);
     }
-    $time_paragraph->save();
 
-    $paragraphs[] = [
-      'target_id' => $time_paragraph->id(),
-      'target_revision_id' => $time_paragraph->getRevisionId(),
-    ];
-
-    $node->set('field_session_time', $paragraphs);
-    if ($event['title']){
-      $node->setTitle($event['title']);
-    }
-    $this->setFieldsSession($node, $event);
-    $node->save();
-
-    return new JsonResponse(['id' => $node->id()]);
+    return $this->changeSession($node, $event_data);
   }
 
   /**
@@ -112,36 +89,39 @@ class FullCalendarController extends ControllerBase {
    */
   public function createEvent(Request $request): JsonResponse {
     $event_data = $request->toArray();
-    return $this->createSession($event_data);
+
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $session = $node_storage->create([
+      'uid' => \Drupal::currentUser()->id(),
+      'lang' => 'und',
+      'type' => 'session',
+      'title' => $event_data['title'],
+    ]);
+
+    return $this->changeSession($session, $event_data);
   }
 
   /**
-   * Creates a new session node with the provided data.
+   * Set fields session.
    *
    * @param array $data
    *    The event data.
    *
    * @return JsonResponse
    */
-  public function createSession(array $data): JsonResponse {
-    // TODO: \Drupal\openy_daxko_gxp_syncer\syncer\SessionManager::createSession
-    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  public function changeSession($session, array $data): JsonResponse {
+    if ($data['eventClass']) {
+      $session->set('field_session_class', [
+        'target_id' => $data['eventClass'],
+        'target_revision_id' => $data['eventClass'],
+      ]);
+    }
 
-    $session = $node_storage->create([
-      'uid' => \Drupal::currentUser()->id(),
-      'lang' => 'und',
-      'type' => 'session',
-      'title' => $data['title'],
-    ]);
+    if ($data['locationId']) {
+      $session->set('field_session_location', ['target_id' => $data['locationId']]);
+    }
 
-    // todo getRevision id
-    $session->set('field_session_class', [
-      'target_id' => $data['eventClass'],
-      'target_revision_id' => $data['eventClass'],
-    ]);
-
-    $session->set('field_session_time', $this->getSessionTime($data));
-    $session->set('field_session_location', ['target_id' => $data['locationId']]);
+    $session->set('field_session_time', $this->getSessionTime($session, $data));
 
     $this->setFieldsSession($session, $data);
     $session->save();
@@ -152,7 +132,7 @@ class FullCalendarController extends ControllerBase {
   protected function setFieldsSession(&$session, $data) {
     $fields = [
       'field_session_room' => 'room',
-      'field_session_instructor' => 'field_session_color',
+      'field_session_instructor' => 'field_session_instructor',
       'field_session_description' => 'description',
       'field_session_color' => 'colorEvent',
     ];
@@ -162,6 +142,7 @@ class FullCalendarController extends ControllerBase {
       }
     }
   }
+
   /**
    * Creates a Paragraph entity for session time.
    *
@@ -171,33 +152,38 @@ class FullCalendarController extends ControllerBase {
    * @return array
    *    An array of target IDs and revision IDs for the session time.
    */
-  private function getSessionTime(array $scheduleData): array {
-    $paragraphs = [];
-    $paragraph = Paragraph::create(['type' => 'session_time']);
-    $paragraph->set('field_session_time_days', explode(',', $scheduleData["days"]));
+  private function getSessionTime($session, array $scheduleData): array {
+    $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
 
-    // Format: 'value' => '2024-01-11T17:43:47',
-    $paragraph->set('field_session_time_date',
+    if (!$session->get('field_session_time')->getValue() || !($time_paragraph = $paragraph_storage->load($session->field_session_time->target_id))) {
+      $time_paragraph = $paragraph_storage->create(['type' => 'session_time']);
+      $time_paragraph->isNew();
+    }
+
+    if ($scheduleData['days']) {
+      $time_paragraph->set('field_session_time_days', explode(',', $scheduleData['days']));
+    }
+
+    $time_paragraph->set('field_session_time_date',
       [
         'value' => $this->convertDate($scheduleData['startGlobal']),
         'end_value' => $this->convertDate($scheduleData['endGlobal']),
       ]
     );
-    $paragraph->isNew();
-    $paragraph->save();
 
-    $paragraphs[] = [
-      'target_id' => $paragraph->id(),
-      'target_revision_id' => $paragraph->getRevisionId(),
+    $time_paragraph->save();
+
+    return [
+      'target_id' => $time_paragraph->id(),
+      'target_revision_id' => $time_paragraph->getRevisionId(),
     ];
-
-    return $paragraphs;
   }
 
   protected function convertDate($date) {
     $date_obj = new DrupalDateTime($date, \Drupal::configFactory()->get('system.date')->get('timezone')['default']);
-    return substr($date_obj->format('c', ['timezone'=> 'UTC']), 0, 19);
+    return substr($date_obj->format('c', ['timezone' => 'UTC']), 0, 19);
   }
+
   /**
    * Retrieves a list of branches.
    *
@@ -238,7 +224,7 @@ class FullCalendarController extends ControllerBase {
     $query->condition('n.status', NodeInterface::PUBLISHED);
     $query->condition('n.type', 'class');
     $query->orderBy('n.title');
-    $res =  $query->execute()->fetchAllKeyed();
+    $res = $query->execute()->fetchAllKeyed();
 
     return new JsonResponse($res);
   }

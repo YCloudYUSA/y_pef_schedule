@@ -266,6 +266,9 @@ export default {
         calendarEvent.setEnd(updatedEvent.end);
         calendarEvent.setProp('color', updatedEvent.colorEvent);
         calendarEvent.setExtendedProp('colorEvent', updatedEvent.colorEvent);
+        calendarEvent.setExtendedProp('description', updatedEvent.description);
+        calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);
+        calendarEvent.setExtendedProp('room', updatedEvent.room);
       }
       // this.eventService.updateEventOnServer(updatedEvent);
     },
