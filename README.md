@@ -44,7 +44,7 @@ The fullcalendar-app component allows users to create events interactively. When
 To customize the form or extend the functionality, refer to the Vue.js component documentation and customize the handleDateClick and createEvent methods in the fullcalendar-app component.
 
 ### Requirements
-* Drupal 9
+* Drupal 9|10
 * Open Y Repeat
 * Vue.js 3
 * Axios
