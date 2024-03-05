@@ -3,7 +3,7 @@ type: module
 description: Additional module to manage your branch schedules.
 core_version_requirement: ^10
 configure: y_pef_schedule.branches
-package: 'Open Y'
+package: 'YMCA Website Services'
 version: 1.0
 lifecycle: experimental
 dependencies:
