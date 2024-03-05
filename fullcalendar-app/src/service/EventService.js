@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { getTime } from 'date-fns'; // Importing formatISO to handle dates
-import { API_BASE_URL, SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig'; // Importing config
+import { API_BASE_URL, SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig';
 
 export default class EventService {
 
@@ -43,21 +42,17 @@ export default class EventService {
   }
 
   getBranch() {
-    return window.drupalSettings?.path?.branch || null;
+    return window.drupalSettings.fullCalendar?.branch || null;
   }
 
   async updateEventOnServer(eventData) {
     try {
       const response = await axios.post(`${API_BASE_URL}${UPDATE_EVENT_ENDPOINT}`, eventData);
-
-      // If the request is successful, get the event id from the response
       if (response.status === 200) {
-        // Show a success message
-        // alert('Event saved successfully!');
         return response.data;
       }
     } catch (error) {
-      throw new Error('Failed to update the event.');
+      throw new Error(`Failed to update the event. Please check your network connection or contact support if the problem persists. Error details: ${error.message || error}`);
     }
   }
 }

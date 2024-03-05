@@ -89,6 +89,8 @@ class FullCalendarController extends ControllerBase {
    *    A render array for the calendar view.
    */
   public function calendarView(string $branch): array {
+    $config = \Drupal::config('y_pef_schedule.settings');
+
     $build = [
       '#type' => 'html_tag',
       '#tag' => 'div',
@@ -103,7 +105,18 @@ class FullCalendarController extends ControllerBase {
         ],
       ],
     ];
-    $build['#attached']['drupalSettings']['path']['branch'] = $branch;
+    $build['#cache']['tags'][] = 'config:y_pef_schedule.settings';
+    $build['#attached']['drupalSettings']['fullCalendar'] = [
+      'branch' => $branch,
+      'slotDuration' => $config->get('slot_duration'),
+      'snapDuration' => $config->get('snap_duration'),
+      'slotLabelInterval' => $config->get('slot_label_interval'),
+      'popover' => [
+        'width' => $config->get('popover_width'),
+        'height' => $config->get('popover_height'),
+        'padding' => $config->get('window_padding'),
+      ],
+    ];
 
     return $build;
   }

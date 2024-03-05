@@ -59,7 +59,14 @@ export default {
       if (Array.isArray(this.selectedCategories)) {
         return this.selectedCategories.includes(categoryName);
       }
-      console.error('selectedCategories is not an array:', this.selectedCategories);
+
+      console.error('Error: selectedCategories is expected to be an array but received a different type.', {
+        actionNeeded: 'Check the initialization of selectedCategories to ensure it is correctly set as an array. This might involve reviewing the data source or state management logic that provides value to selectedCategories.',
+        receivedType: typeof this.selectedCategories,
+        receivedValue: this.selectedCategories,
+        suggestion: 'If selectedCategories data is dynamically loaded, verify the data structure returned by the server or external data source. Ensure any transformation or assignment operation maintains the array data type.',
+      });
+
       return false;
     },
     emitCategoryChange(categoryName, isChecked) {

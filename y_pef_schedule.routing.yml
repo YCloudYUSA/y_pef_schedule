@@ -1,3 +1,11 @@
+fullcalendar.settings:
+  path: '/admin/openy/settings/schedules-calendar'
+  defaults:
+    _form: 'Drupal\y_pef_schedule\Form\FullCalendarSettingsForm'
+    _title: 'Schedules calendar settings'
+  requirements:
+    _permission: 'administer site configuration'
+
 y_pef_schedule.branches:
   path: '/admin/openy/branch-schedules'
   defaults:

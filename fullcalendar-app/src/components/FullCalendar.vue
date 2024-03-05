@@ -69,6 +69,11 @@ export default {
     return {
       activeModal: null,
       popoverStyle: {},
+      popoverConfig: {
+        width: 300,
+        height: 200,
+        padding: 10,
+      },
       selectedEvent: null,
       selectedCategories: [],
       initializationCompleted: false,
@@ -158,6 +163,29 @@ export default {
       const end = new Date(today.setDate(today.getDate() + 7)).toISOString().split('T')[0];
       this.loadEvents(start, end, true);
     }
+
+    // Ensure the Vue component has been fully mounted and all previous DOM
+    // updates have been processed.
+    Vue.nextTick().then(() => {
+      // Check if the drupalSettings object exists and contains the
+      // fullCalendar settings.
+      if (window.drupalSettings && window.drupalSettings.fullCalendar) {
+        // If the settings are present, update the calendarOptions object with
+        // the settings from drupalSettings. This updates the slotDuration,
+        // snapDuration, and slotLabelInterval properties of the calendarOptions
+        // object, which are used to configure the behavior and appearance of
+        // the FullCalendar component within the Vue application.
+        this.calendarOptions.slotDuration = window.drupalSettings.fullCalendar.slotDuration;
+        this.calendarOptions.snapDuration = window.drupalSettings.fullCalendar.snapDuration;
+        this.calendarOptions.slotLabelInterval = window.drupalSettings.fullCalendar.slotLabelInterval;
+      }
+
+      if (window.drupalSettings.fullCalendar.popover) {
+        this.popoverConfig.width = window.drupalSettings.fullCalendar.popover.width || this.popoverConfig.width;
+        this.popoverConfig.height = window.drupalSettings.fullCalendar.popover.height || this.popoverConfig.height;
+        this.popoverConfig.padding = window.drupalSettings.fullCalendar.popover.padding || this.popoverConfig.padding;
+      }
+    });
   },
   methods: {
     downloadPDF() {
@@ -220,7 +248,12 @@ export default {
         document.body.removeChild(clone);
         pdf.save(options.filename);
       }).catch(function(error) {
-        console.error('Error creating PDF:', error);
+        console.error('Error creating PDF. Action needed:', {
+          message: 'Failed to create a PDF document from the provided HTML content. An error occurred during the PDF generation process.',
+          action: 'Check if all dependencies for the html2pdf library are correctly loaded and ensure the HTML structure provided to the library does not contain any elements or attributes that could cause the generation to fail.',
+          errorDetails: error.message || error,
+          tip: 'Review any warnings or errors in the console related to html2pdf or its dependencies. Consider testing the PDF generation process with a simplified HTML structure to isolate the issue. If the problem persists, you might need to explore alternative PDF generation libraries or methods that suit your specific requirements better.'
+        });
         // Make sure the copy is deleted even in case of error.
         document.body.removeChild(clone);
       });
@@ -279,7 +312,6 @@ export default {
     addEventToCalendar(newEvent) {
       const calendarApi = this.$refs.fullCalendar.getApi();
       newEvent.id = newEvent.nid + '-' + Math.random().toString(16).slice(2);
-      console.log(newEvent)
 
       calendarApi.addEvent(newEvent);
     },
@@ -341,29 +373,24 @@ export default {
       };
     },
     handleEventClick(clickInfo) {
-      // Approximate width of the popover.
-      const popoverWidth = 300;
-      // Approximate height of the popover.
-      const popoverHeight = 200;
-      // Minimum space between the popover and the edge of the window.
-      const windowPadding = 10;
-
+      const { width, height, padding } = this.popoverConfig;
+      console.log('this.popoverConfig', this.popoverConfig);
       let top = clickInfo.jsEvent.clientY;
       let left = clickInfo.jsEvent.clientX;
 
       // Adjust for the bottom edge of the window.
-      if (window.innerHeight - top < popoverHeight + windowPadding) {
-        top -= popoverHeight;
+      if (window.innerHeight - top < width + padding) {
+        top -= height;
       }
 
       // Adjust for the right edge of the window.
-      if (window.innerWidth - left < popoverWidth + windowPadding) {
-        left -= popoverWidth;
+      if (window.innerWidth - left < width + padding) {
+        left -= width;
       }
 
       // Prevent popover from going off the top or left edge of the screen.
-      top = Math.max(windowPadding, top);
-      left = Math.max(windowPadding, left);
+      top = Math.max(padding, top);
+      left = Math.max(padding, left);
 
       this.popoverStyle = {
         top: `${top}px`,
@@ -402,7 +429,12 @@ export default {
           this.categories = response.data
         })
         .catch(error => {
-          console.error('Error loading classes:', error);
+          console.error('Error loading categories:', {
+            message: 'Failed to load categories from "/schedules-categories". Please check the server connection and ensure the endpoint is correctly configured.',
+            action: 'Verify the server status, check the network connection, and ensure that the "/schedules-categories" endpoint is accessible, properly implemented, and returns the expected data structure.',
+            errorDetails: error.message || error,
+            tip: 'Review the server logs for any error messages related to the "/schedules-categories" endpoint. This can provide insights into why the request failed. If the issue persists, consider reaching out to the backend team for further assistance or checking the endpoint configuration for any recent changes that might have affected its accessibility or functionality.'
+          });
         });
     },
   }

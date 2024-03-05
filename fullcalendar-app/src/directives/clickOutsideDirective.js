@@ -7,8 +7,6 @@ export default {
       // If the click is outside the element, the method is passed and the
       // click is not on the calendar event.
       if (!(el.contains(event.target)) && binding.value && !calendarEventClicked) {
-        console.log("click outside event triggered");
-
         binding.value(event, el);
       }
     };

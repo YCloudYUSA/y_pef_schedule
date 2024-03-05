@@ -75,7 +75,7 @@
 <script>
 import axios from 'axios';
 import Select2 from 'vue3-select2-component';
-import {object} from "yup";
+import { UPDATE_EVENT_ENDPOINT, CREATE_EVENT_ENDPOINT } from '@/config/apiConfig';
 
 export default {
   name: 'EventPopup',
@@ -141,7 +141,12 @@ export default {
           }));
         })
         .catch(error => {
-          console.error('Error loading classes:', error);
+          console.error('Error loading classes:', {
+            message: 'Failed to load class options from the server. Please check the server connection and ensure the endpoint "/classes-options" is correctly configured.',
+            action: 'Verify the network connection, check the server logs for any errors related to the "/classes-options" endpoint, and ensure that the endpoint is properly implemented and accessible.',
+            errorDetails: error.message || error,
+            tip: 'If the problem persists, consider contacting the server administrator or technical support with the details of this error log.'
+          });
         });
     },
     loadLocations() {
@@ -152,11 +157,24 @@ export default {
             text: title
           }))
           if (this.event.location) {
-            this.event.locationId = this.selectLocations.filter((location) => this.event.location === location.text)[0].id
+            const matchingLocation = this.selectLocations.find(location => this.event.location === location.text);
+            this.event.locationId = matchingLocation ? matchingLocation.id : null;
+            if (!matchingLocation) {
+              console.warn('Warning: Location not found. Action needed:', {
+                message: `The location '${this.event.location}' was not found in the loaded options.`,
+                action: 'Ensure the event\'s location matches one of the available options in /branches-options. It might require updating the event location or ensuring the /branches-options endpoint returns all expected location options.',
+                suggestion: 'Check the list of locations returned by /branches-options for completeness. If the location is missing, update the backend to include all necessary locations.',
+              });
+            }
           }
         })
         .catch(error => {
-          console.error('Error loading options:', error);
+          console.error('Error loading locations:', {
+            message: 'Failed to load locations from /branches-options. Please check if the server is running and the endpoint is correctly configured.',
+            action: 'Verify the server status, check the network connection, and ensure the /branches-options endpoint is accessible and returning the correct data structure.',
+            errorDetails: error.message || error,
+            tip: 'If the problem persists, consider reviewing server logs for more details or contacting technical support with this error information.'
+          });
         });
     },
     formatDateTimeLocal(dateString) {
@@ -175,17 +193,10 @@ export default {
       eventData.eventClass = this.event.eventClass;
 
       try {
-        console.log('Sending event to the server ...', eventData);
-        // TODO: Should be const in configuration.
-        let url;
-        if (eventData.nid) {
-          url ='/admin/openy/branch-schedules/update-event';
-        } else {
-          url = '/admin/openy/branch-schedules/create-event';
-        }
+        const url = eventData.nid ? UPDATE_EVENT_ENDPOINT : CREATE_EVENT_ENDPOINT;
+
         const response = await axios.post(url, eventData);
         if (response.status === 200) {
-
           if (response.data.id) {
             eventData.nid = response.data.id;
           }
@@ -194,7 +205,12 @@ export default {
           this.handleClose();
         }
       } catch (error) {
-        console.error('Error sending event to the server:', error);
+        console.error('Error sending event to the server. Action Needed: Please check the network connection and try again.', {
+          eventData,
+          errorDetails: error.message || error,
+          url: eventData.nid ? 'Updating event' : 'Creating new event',
+          action: 'If the problem persists, contact support with this error log.',
+        });
       }
     },
     submitEvent() {
@@ -205,19 +221,15 @@ export default {
       this.$emit('close');
     },
     changeLocation(value) {
-      console.log('Change event:', value);
       this.event.location = value;
     },
     selectEvent({ id, text }) {
-      console.log('Select event:', { id, text });
       this.event.location = id;
     },
     changeClass(value) {
-      console.log('Change class:', value);
       this.event.eventClass = value;
     },
     selectClass({ id, text }) {
-      console.log('Select class:', { id, text });
       this.event.eventClass = id;
     }
   },
