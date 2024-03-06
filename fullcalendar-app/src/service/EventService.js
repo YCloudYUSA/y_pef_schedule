@@ -25,14 +25,14 @@ export default class EventService {
     if (start === end) {
       return [];
     }
-
     // Convert start and end dates to ISO strings which are effectively timestamps
     const formattedStart = start.substr(0, 19);
     const formattedEnd = end.substr(0, 19);
 
-    const branch = encodeURIComponent(this.getBranch());
+    const branchID = this.getBranchId();
+
     const categoryParams = categories.length > 0 ? '/' + categories.join(',') : '';
-    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${branch}/${formattedStart}/${formattedEnd}${categoryParams}`;
+    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${branchID}/${formattedStart}/${formattedEnd}${categoryParams}`;
 
     try {
       const response = await axios.get(url);
@@ -65,14 +65,25 @@ export default class EventService {
   }
 
   /**
-   * Retrieves the 'branch' setting from the window.drupalSettings object.
+   * Retrieves the 'branch title' setting from the window.drupalSettings object.
    * If the 'branch' setting is not defined within the drupalSettings,
    * it will return null as the default value.
    *
-   * @returns {string|null} The 'branch' setting value if available, otherwise null.
+   * @returns {string|null} The 'branch title' setting value if available, otherwise null.
    */
-  getBranch() {
-    return window.drupalSettings.fullCalendar?.branch || null;
+  getBranchTitle() {
+    return window.drupalSettings.fullCalendar?.branch_title || null;
+  }
+
+  /**
+   * Retrieves the 'branch ID' setting from the window.drupalSettings object.
+   * If the 'branch' setting is not defined within the drupalSettings,
+   * it will return null as the default value.
+   *
+   * @returns {string|null} The 'branch ID' setting value if available, otherwise null.
+   */
+  getBranchId() {
+    return window.drupalSettings.fullCalendar?.branch_id || null;
   }
 
   /**

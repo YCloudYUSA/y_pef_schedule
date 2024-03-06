@@ -314,7 +314,7 @@ class RepeatScheduleController extends RepeatController {
       $query->condition('re.category', explode(',', $categories), 'IN');
     }
     if (!empty($location)) {
-      $query->condition('nd.title', explode(';', rawurldecode($location)), 'IN');
+      $query->condition('nd.nid', $location);
     }
 
     // Handle exclusions and limits from the request
@@ -326,6 +326,9 @@ class RepeatScheduleController extends RepeatController {
     if (!empty($limit)) {
       $query->condition('re.category', explode(';', $limit), 'IN');
     }
+
+    $query->isNotNull('sq.start_date');
+    $query->isNotNull('sq.end_date');
   }
 
   /**

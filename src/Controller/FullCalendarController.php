@@ -102,6 +102,7 @@ class FullCalendarController extends ControllerBase {
    */
   public function calendarView(string $branch): array {
     $fullcalendar_settings = $this->configFactory->get('y_pef_schedule.settings');
+    $node_storage = $this->entityTypeManager->getStorage('node');
 
     $build = [
       '#type' => 'html_tag',
@@ -120,7 +121,8 @@ class FullCalendarController extends ControllerBase {
     $build['#cache']['tags'][] = 'config:y_pef_schedule.settings';
 
     $build['#attached']['drupalSettings']['fullCalendar'] = [
-      'branch' => $branch,
+      'branch_title' => $node_storage->load($branch)?->getTitle(),
+      'branch_id' => $branch,
       'slotDuration' => $fullcalendar_settings->get('slot_duration'),
       'snapDuration' => $fullcalendar_settings->get('snap_duration'),
       'slotLabelInterval' => $fullcalendar_settings->get('slot_label_interval'),

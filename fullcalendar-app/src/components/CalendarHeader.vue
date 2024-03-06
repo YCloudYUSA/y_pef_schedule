@@ -1,8 +1,8 @@
 <template>
   <div class="calendar-branch-header">
-    <div class="calendar-branch-info" v-if="branch">
+    <div class="calendar-branch-info" v-if="branchTitle">
       <h4>{{ 'Branch name' }}</h4>
-      <h2>{{ branch }}</h2>
+      <h2>{{ branchTitle }}</h2>
     </div>
   </div>
 
@@ -43,12 +43,12 @@ export default {
   data() {
     return {
       isLegendOpen: false,
-      branch: null,
+      branchTitle: null,
     };
   },
   mounted() {
     const eventService = new EventService();
-    this.branch = eventService.getBranch();
+    this.branchTitle = eventService.getBranchTitle();
   },
   methods: {
     toggleLegend() {

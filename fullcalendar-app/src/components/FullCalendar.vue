@@ -52,7 +52,7 @@ import {
 } from '@/utils/dateUtils';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
-
+import { format } from 'date-fns';
 
 import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
@@ -354,10 +354,11 @@ export default {
     },
     getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
+      const calendarApi = this.$refs.fullCalendar.getApi();
 
       return {
-        start: urlParams.get('start'),
-        end: urlParams.get('end'),
+        start: urlParams.get('start') ?? format(calendarApi.view.activeStart, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        end: urlParams.get('end') ?? format(calendarApi.view.activeEnd, "yyyy-MM-dd'T'HH:mm:ssXXX"),
         categories: urlParams.get('categories')?.split(',') || []
       };
     },
