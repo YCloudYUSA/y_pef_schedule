@@ -442,16 +442,16 @@ export default {
       calendarApi.gotoDate(startDate);
     },
     loadCategories() {
-      axios.get('/schedules-categories')
+      axios.get('/fullcalendar-api/get-schedules-categories')
         .then(response => {
           this.categories = response.data
         })
         .catch(error => {
           console.error('Error loading categories:', {
-            message: 'Failed to load categories from "/schedules-categories". Please check the server connection and ensure the endpoint is correctly configured.',
-            action: 'Verify the server status, check the network connection, and ensure that the "/schedules-categories" endpoint is accessible, properly implemented, and returns the expected data structure.',
+            message: 'Failed to load categories from "/fullcalendar-api/get-schedules-categories". Please check the server connection and ensure the endpoint is correctly configured.',
+            action: 'Verify the server status, check the network connection, and ensure that the "/fullcalendar-api/get-schedules-categories" endpoint is accessible, properly implemented, and returns the expected data structure.',
             errorDetails: error.message || error,
-            tip: 'Review the server logs for any error messages related to the "/schedules-categories" endpoint. This can provide insights into why the request failed. If the issue persists, consider reaching out to the backend team for further assistance or checking the endpoint configuration for any recent changes that might have affected its accessibility or functionality.'
+            tip: 'Review the server logs for any error messages related to the "/fullcalendar-api/get-schedules-categories" endpoint. This can provide insights into why the request failed. If the issue persists, consider reaching out to the backend team for further assistance or checking the endpoint configuration for any recent changes that might have affected its accessibility or functionality.'
           });
         });
     },

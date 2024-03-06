@@ -133,7 +133,7 @@ export default {
       this.handleClose();
     },
     loadClasses() {
-      axios.get('/classes-options')
+      axios.get('/fullcalendar-api/get-classes-options')
         .then(response => {
           this.selectClasses = Object.entries(response.data).map(([id, title]) => ({
             id: id,
@@ -142,15 +142,15 @@ export default {
         })
         .catch(error => {
           console.error('Error loading classes:', {
-            message: 'Failed to load class options from the server. Please check the server connection and ensure the endpoint "/classes-options" is correctly configured.',
-            action: 'Verify the network connection, check the server logs for any errors related to the "/classes-options" endpoint, and ensure that the endpoint is properly implemented and accessible.',
+            message: 'Failed to load class options from the server. Please check the server connection and ensure the endpoint "/fullcalendar-api/get-classes-options" is correctly configured.',
+            action: 'Verify the network connection, check the server logs for any errors related to the "/fullcalendar-api/get-classes-options" endpoint, and ensure that the endpoint is properly implemented and accessible.',
             errorDetails: error.message || error,
             tip: 'If the problem persists, consider contacting the server administrator or technical support with the details of this error log.'
           });
         });
     },
     loadLocations() {
-      axios.get('/branches-options')
+      axios.get('/fullcalendar-api/get-branches-options')
         .then(response => {
           this.selectLocations = Object.entries(response.data).map(([id, title]) => ({
             id: id,
@@ -162,16 +162,16 @@ export default {
             if (!matchingLocation) {
               console.warn('Warning: Location not found. Action needed:', {
                 message: `The location '${this.event.location}' was not found in the loaded options.`,
-                action: 'Ensure the event\'s location matches one of the available options in /branches-options. It might require updating the event location or ensuring the /branches-options endpoint returns all expected location options.',
-                suggestion: 'Check the list of locations returned by /branches-options for completeness. If the location is missing, update the backend to include all necessary locations.',
+                action: 'Ensure the event\'s location matches one of the available options in /fullcalendar-api/get-branches-options. It might require updating the event location or ensuring the /fullcalendar-api/get-branches-options endpoint returns all expected location options.',
+                suggestion: 'Check the list of locations returned by /fullcalendar-api/get-branches-options for completeness. If the location is missing, update the backend to include all necessary locations.',
               });
             }
           }
         })
         .catch(error => {
           console.error('Error loading locations:', {
-            message: 'Failed to load locations from /branches-options. Please check if the server is running and the endpoint is correctly configured.',
-            action: 'Verify the server status, check the network connection, and ensure the /branches-options endpoint is accessible and returning the correct data structure.',
+            message: 'Failed to load locations from /fullcalendar-api/get-branches-options. Please check if the server is running and the endpoint is correctly configured.',
+            action: 'Verify the server status, check the network connection, and ensure the /fullcalendar-api/get-branches-options endpoint is accessible and returning the correct data structure.',
             errorDetails: error.message || error,
             tip: 'If the problem persists, consider reviewing server logs for more details or contacting technical support with this error information.'
           });

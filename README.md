@@ -27,7 +27,7 @@ After choosing a brunch, you can view the calendar, the main features of the cal
 The module provides controllers to handle AJAX requests for fetching events. Use the following route in your JavaScript code:
 
 ```javascript
-axios.get('/schedules/get-event-data-date-range/{location}/{start}/{end}/{category}')
+axios.get('/fullcalendar-api/get-event-data-date-range/{location}/{start}/{end}/{category}')
   .then(response => {
     const events = response.data;
     // Process the received events as needed
