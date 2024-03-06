@@ -6,7 +6,7 @@ y_pef_schedule-app:
   css:
     theme:
       assets/css/custom-calendar-styles.css: { minified: false }
-      fullcalendar-app/dist/fullcalendar-app.css: { minified: false }
+      fullcalendar-app/dist/fullcalendar-app.css: { minified: true }
   dependencies:
     - y_pef_schedule/vue3
     - openy_carnation/global-styling

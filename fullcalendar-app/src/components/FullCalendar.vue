@@ -34,10 +34,6 @@
 </template>
 
 <script>
-
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-
 import CalendarHeader from './CalendarHeader.vue';
 import FullCalendar from '@fullcalendar/vue3';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -261,7 +257,7 @@ export default {
       this.selectedEvent = {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        location: this.eventService.getBranch(),
+        location: this.eventService.getBranchTitle(),
       };
 
       this.openPopup('eventPopup')
