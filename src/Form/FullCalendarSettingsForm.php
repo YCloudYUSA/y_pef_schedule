@@ -65,33 +65,6 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       '#description' => $this->t('The slotLabelInterval setting specifies the interval between time labels displayed along the calendar\'s axis (e.g., "01:00" for every hour).'),
     ];
 
-    $form['popover'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Popover styles'),
-      '#open' => FALSE,
-    ];
-    $form['popover']['popover_width'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Popover Width'),
-      '#default_value' => $config->get('popover_width'),
-      '#description' => $this->t('Approximate width of the popover in pixels.'),
-      '#min' => 100,
-    ];
-    $form['popover']['popover_height'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Popover Height'),
-      '#default_value' => $config->get('popover_height'),
-      '#description' => $this->t('Approximate height of the popover in pixels.'),
-      '#min' => 100,
-    ];
-    $form['popover']['window_padding'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Window Padding'),
-      '#default_value' => $config->get('window_padding'),
-      '#description' => $this->t('Minimum space between the popover and the edge of the window in pixels.'),
-      '#min' => 0,
-    ];
-
     return parent::buildForm($form, $form_state);
   }
 
@@ -103,9 +76,6 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       ->set('slot_duration', $form_state->getValue('slot_duration'))
       ->set('snap_duration', $form_state->getValue('snap_duration'))
       ->set('slot_label_interval', $form_state->getValue('slot_label_interval'))
-      ->set('popover_width', $form_state->getValue('popover_width'))
-      ->set('popover_height', $form_state->getValue('popover_height'))
-      ->set('window_padding', $form_state->getValue('window_padding'))
       ->save();
 
     parent::submitForm($form, $form_state);

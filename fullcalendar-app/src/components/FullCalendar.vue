@@ -23,6 +23,7 @@
     />
 
     <EventPopover
+      ref="popover"
       v-if="activeModal === 'eventPopover'"
       :event="selectedEvent"
       :style="popoverStyle"
@@ -47,7 +48,6 @@ import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import EventService from '../service/EventService';
 import {
   combineDateTime,
-  formatDateTimeLocal,
   updateUrlParams
 } from '@/utils/dateUtils';
 import axios from 'axios';
@@ -69,11 +69,6 @@ export default {
     return {
       activeModal: null,
       popoverStyle: {},
-      popoverConfig: {
-        width: 300,
-        height: 200,
-        padding: 10,
-      },
       selectedEvent: null,
       selectedCategories: [],
       initializationCompleted: false,
@@ -178,12 +173,6 @@ export default {
         this.calendarOptions.slotDuration = window.drupalSettings.fullCalendar.slotDuration;
         this.calendarOptions.snapDuration = window.drupalSettings.fullCalendar.snapDuration;
         this.calendarOptions.slotLabelInterval = window.drupalSettings.fullCalendar.slotLabelInterval;
-      }
-
-      if (window.drupalSettings.fullCalendar.popover) {
-        this.popoverConfig.width = window.drupalSettings.fullCalendar.popover.width || this.popoverConfig.width;
-        this.popoverConfig.height = window.drupalSettings.fullCalendar.popover.height || this.popoverConfig.height;
-        this.popoverConfig.padding = window.drupalSettings.fullCalendar.popover.padding || this.popoverConfig.padding;
       }
     });
   },
@@ -373,30 +362,6 @@ export default {
       };
     },
     handleEventClick(clickInfo) {
-      const { width, height, padding } = this.popoverConfig;
-      console.log('this.popoverConfig', this.popoverConfig);
-      let top = clickInfo.jsEvent.clientY;
-      let left = clickInfo.jsEvent.clientX;
-
-      // Adjust for the bottom edge of the window.
-      if (window.innerHeight - top < width + padding) {
-        top -= height;
-      }
-
-      // Adjust for the right edge of the window.
-      if (window.innerWidth - left < width + padding) {
-        left -= width;
-      }
-
-      // Prevent popover from going off the top or left edge of the screen.
-      top = Math.max(padding, top);
-      left = Math.max(padding, left);
-
-      this.popoverStyle = {
-        top: `${top}px`,
-        left: `${left}px`
-      };
-
       this.selectedEvent = {
         id: clickInfo.event.id,
         nid: clickInfo.event.extendedProps.nid,
@@ -404,7 +369,6 @@ export default {
         start: clickInfo.event.start,
         end: clickInfo.event.end,
         room: clickInfo.event.extendedProps.room,
-        // colorEvent: clickInfo.event.extendedProps.colorEvent,
         colorEvent: clickInfo.event.extendedProps.colorEvent,
         instructor: clickInfo.event.extendedProps.instructor,
         description: clickInfo.event.extendedProps.description,
@@ -413,10 +377,63 @@ export default {
         days: clickInfo.event.extendedProps.days,
         startGlobal: clickInfo.event.extendedProps.startGlobal,
         endGlobal: clickInfo.event.extendedProps.endGlobal,
-        // ... other fields.
       };
 
       this.openPopup('eventPopover');
+
+      this.$nextTick(() => {
+        // Ensure the popover element is ready in the DOM
+        if (this.$refs.popover) {
+          // Get the popover element and its dimensions
+          const popoverElement = this.$refs.popover.$el;
+          const popoverRect = popoverElement.getBoundingClientRect();
+
+          // Get the event element dimensions and position
+          const eventRect = clickInfo.el.getBoundingClientRect();
+          // Get the calendar scroll container dimensions and position
+          const calendarRect = document.querySelector('.fc-scrollgrid').getBoundingClientRect();
+
+          // Determine the optimal horizontal position for the popover
+          let left;
+          // Check if there's enough space to the right of the event for the popover
+          if (eventRect.right + popoverRect.width <= calendarRect.right) {
+            // Position the popover to the right of the event
+            left = eventRect.right;
+          } else if (eventRect.left - popoverRect.width >= calendarRect.left) {
+            // Position the popover to the left of the event if there's not enough space to the right
+            left = eventRect.left - popoverRect.width;
+          } else {
+            // If there's insufficient space on either side, center the popover horizontally with respect to the event
+            left = eventRect.left + (eventRect.width - popoverRect.width) / 2;
+          }
+
+          // Determine the optimal vertical position for the popover
+          let top;
+          // Check if there's enough space above the event for the popover
+          if (eventRect.top - popoverRect.height >= calendarRect.top) {
+            // Position the popover above the event
+            top = eventRect.top - popoverRect.height;
+          } else if (eventRect.bottom + popoverRect.height <= calendarRect.bottom) {
+            // Position the popover below the event if there's not enough space above
+            top = eventRect.bottom;
+          } else {
+            // If there's insufficient space above or below, center the popover vertically with respect to the event
+            top = eventRect.top + (eventRect.height - popoverRect.height) / 2;
+          }
+
+          // Adjust position to ensure the popover stays within the calendar view
+          top = Math.max(calendarRect.top, Math.min(top, calendarRect.bottom - popoverRect.height));
+          left = Math.max(calendarRect.left, Math.min(left, calendarRect.right - popoverRect.width));
+
+          // Apply the calculated styles to the popover for it to appear in the correct position
+          this.popoverStyle = {
+            top: `${top}px`,
+            left: `${left}px`,
+            position: 'absolute',
+            zIndex: 100
+          };
+        }
+      });
     },
     setInitialDate(startDate) {
       // Logic to set the start date of the calendar.

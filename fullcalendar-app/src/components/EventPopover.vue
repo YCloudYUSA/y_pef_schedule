@@ -62,6 +62,7 @@ export default {
     position: absolute;
     z-index: 100;
     width: auto;
+    min-width: 260px;
     max-width: 600px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 

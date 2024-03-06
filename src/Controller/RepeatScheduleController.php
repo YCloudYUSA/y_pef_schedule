@@ -7,6 +7,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\openy_repeat\Controller\RepeatController;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,11 +50,19 @@ class RepeatScheduleController extends RepeatController {
   protected $configFactory;
 
   /**
+   * A logger instance.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected LoggerInterface $logger;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): self {
     $instance = parent::create($container);
     $instance->configFactory = $container->get('config.factory');
+    $instance->logger = $container->get('logger.factory')->get('y_pef_schedule');
     return $instance;
   }
 
@@ -86,10 +95,8 @@ class RepeatScheduleController extends RepeatController {
    *   This allows for retrieval of events that fall into specific categories.
    *
    * @return array
-   *   An array of processed event data, formatted for easy consumption by the
-   *   caller. The structure of this array and the specific fields included may
-   *   depend on the implementation of `processResult` and the needs of the
-   *   consuming client or view.
+   *   An array of events within the specified date range.
+   * @throws \Exception
    */
   public function getDateRangeData(Request $request, string $location, string $start_date, string $end_date, string $categories): array {
     $query = $this->database->select('repeat_event', 're');
@@ -97,6 +104,21 @@ class RepeatScheduleController extends RepeatController {
     $this->addFields($query);
     $this->addCondition($query, $start_date, $end_date, $categories, $location, $request);
     $result = $query->execute()->fetchAll();
+
+    // If the number of results is greater than 1000, log a warning.
+    if (count($result) > 1000) {
+      $this->logger->warning('Large date range selection: @count results fetched for location @location from @start_date to @end_date with categories @categories.', [
+        '@count' => count($result),
+        '@location' => $location,
+        '@start_date' => $start_date,
+        '@end_date' => $end_date,
+        '@categories' => $categories,
+      ]);
+    }
+    // If the number of results exceeds 5000, throw an exception.
+    if (count($result) > 5000) {
+      throw new \Exception("Excessive amount of data: More than 5000 results fetched. Please narrow down your selection criteria.");
+    }
 
     return $this->processResult($result, $this->getWeekDate($start_date));
   }

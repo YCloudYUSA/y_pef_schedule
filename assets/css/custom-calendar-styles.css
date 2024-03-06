@@ -4,6 +4,7 @@
 }
 #fullcalendar-app table {
   margin-top: 0 !important;
+  position: relative;
 }
 #fullcalendar-app th.fc-col-header-cell {
   padding-top: 8px;

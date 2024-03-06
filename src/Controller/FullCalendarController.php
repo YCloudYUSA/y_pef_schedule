@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\y_pef_schedule\Controller;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -57,16 +58,26 @@ class FullCalendarController extends ControllerBase {
   protected Connection $database;
 
   /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a CommentController object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    * @param \Drupal\Core\Database\Connection $database
    *   The database service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * *   The configuration factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, ConfigFactoryInterface $config_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->database = $database;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -75,7 +86,8 @@ class FullCalendarController extends ControllerBase {
   public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('database')
+      $container->get('database'),
+      $container->get('config.factory')
     );
   }
 
@@ -89,7 +101,7 @@ class FullCalendarController extends ControllerBase {
    *    A render array for the calendar view.
    */
   public function calendarView(string $branch): array {
-    $config = \Drupal::config('y_pef_schedule.settings');
+    $fullcalendar_settings = $this->configFactory->get('y_pef_schedule.settings');
 
     $build = [
       '#type' => 'html_tag',
@@ -106,16 +118,12 @@ class FullCalendarController extends ControllerBase {
       ],
     ];
     $build['#cache']['tags'][] = 'config:y_pef_schedule.settings';
+
     $build['#attached']['drupalSettings']['fullCalendar'] = [
       'branch' => $branch,
-      'slotDuration' => $config->get('slot_duration'),
-      'snapDuration' => $config->get('snap_duration'),
-      'slotLabelInterval' => $config->get('slot_label_interval'),
-      'popover' => [
-        'width' => $config->get('popover_width'),
-        'height' => $config->get('popover_height'),
-        'padding' => $config->get('window_padding'),
-      ],
+      'slotDuration' => $fullcalendar_settings->get('slot_duration'),
+      'snapDuration' => $fullcalendar_settings->get('snap_duration'),
+      'slotLabelInterval' => $fullcalendar_settings->get('slot_label_interval'),
     ];
 
     return $build;
@@ -383,6 +391,7 @@ class FullCalendarController extends ControllerBase {
     $query->condition('n.status', NodeInterface::PUBLISHED);
     $query->condition('n.type', 'class');
     $query->orderBy('n.title');
+    $query->range(0, 100);
     $res = $query->execute()->fetchAllKeyed();
 
     return new JsonResponse($res);

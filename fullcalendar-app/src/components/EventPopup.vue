@@ -1,6 +1,6 @@
 <template>
   <div class="fc-modal-event modal-backdrop" v-click-outside="handleClose" @click="handleBackdropClick">
-    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block; padding-right: 17px;">
+    <div class="modal fade show" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document" @click.stop>
         <div class="modal-content border-0 shadow-lg rounded-lg">
           <div class="modal-header bg-secondary text-white">
@@ -242,6 +242,10 @@ export default {
 
 <style lang="scss">
 .fullcalendar-app {
+  .modal.show {
+    display: block;
+    padding-right: 17px;
+  }
 
   .modal-backdrop {
     position: fixed;
