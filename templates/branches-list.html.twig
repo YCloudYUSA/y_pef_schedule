@@ -1,0 +1,11 @@
+{{ attach_library('y_pef_schedule/branches-list') }}
+
+<ul class="admin-schedule-list">
+  {% for key, value in branches %}
+    <li class="schedule-item">
+      <a href="{{ path('y_pef_schedule.fullcalendar', {'branch': key}) }}" class="schedule-link">
+        {{ value }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>

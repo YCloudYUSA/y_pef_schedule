@@ -1,0 +1,75 @@
+fullcalendar.settings:
+  path: '/admin/openy/settings/schedules-calendar'
+  defaults:
+    _form: 'Drupal\y_pef_schedule\Form\FullCalendarSettingsForm'
+    _title: 'Schedules calendar settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+y_pef_schedule.branches:
+  path: '/admin/openy/branch-schedules'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::branchesListPage'
+    _title: 'Branches'
+  requirements:
+    _permission: 'access administration pages'
+
+y_pef_schedule.fullcalendar:
+  path: '/admin/openy/branch-schedules/{branch}'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::calendarView'
+    _title: 'Schedules'
+    branch: ''
+  requirements:
+    _permission: 'access administration pages'
+
+y_pef_schedule.create_event:
+  path: '/fullcalendar-api/create-event'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::createEvent'
+    _title: 'Create event'
+  requirements:
+    _permission: 'create session content'
+
+y_pef_schedule.update_event:
+  path: '/fullcalendar-api/update-event'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::updateEvent'
+    _title: 'Update event'
+  requirements:
+    _permission: 'edit own sessions content+edit any session content'
+
+y_pef_schedule.schedules_ajax_date_range:
+  path: '/fullcalendar-api/get-event-data-date-range/{location}/{start}/{end}/{categories}'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\RepeatScheduleController::ajaxSchedulerByDateRange'
+    location: ''
+    start: '0'
+    end: '0'
+    categories: ''
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.schedules_categories:
+  path: '/fullcalendar-api/get-schedules-categories'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getCategories'
+    _title: 'Get categories (aka Activities)'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.branches_options:
+  path: '/fullcalendar-api/get-branches-options'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getBranchesOptions'
+    _title: 'Get locations (aka branches)'
+  requirements:
+    _permission: 'access content'
+
+y_pef_schedule.classes_options:
+  path: '/fullcalendar-api/get-classes-options'
+  defaults:
+    _controller: '\Drupal\y_pef_schedule\Controller\FullCalendarController::getClassesOptions'
+    _title: 'Get classes'
+  requirements:
+    _permission: 'access content'

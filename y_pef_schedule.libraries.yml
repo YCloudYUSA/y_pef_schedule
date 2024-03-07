@@ -1,0 +1,31 @@
+# Main library.
+y_pef_schedule-app:
+  version: 1.0
+  js:
+    fullcalendar-app/dist/fullcalendar-app.umd.min.js: { minified: true }
+  css:
+    theme:
+      assets/css/custom-calendar-styles.css: { minified: false }
+      fullcalendar-app/dist/fullcalendar-app.css: { minified: true }
+  dependencies:
+    - y_pef_schedule/vue3
+    - openy_carnation/global-styling
+
+branches-list:
+  css:
+    theme:
+      assets/css/branches-list.css: { minified: false }
+
+# Vue 3
+vue3:
+  remote: https://github.com/vuejs/vue-next
+  version: 3.3.4
+  license:
+    name: MIT
+    url: https://github.com/vuejs/core/blob/v3.2.37/LICENSE
+    gpl-compatible: true
+  js:
+    //cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js: {type: external, minified: true}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings

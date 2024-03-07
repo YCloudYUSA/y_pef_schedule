@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Implements hooks for the y_pef_schedule module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_theme().
+ */
+function y_pef_schedule_theme(): array {
+  return [
+    'branches_list' => [
+      'variables' => [
+        'branches' => [],
+      ],
+    ],
+  ];
+}

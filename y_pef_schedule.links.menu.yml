@@ -1,0 +1,12 @@
+y_pef_schedule.branches:
+  title: 'Schedules Calendar'
+  description: 'Select a brunch to view the schedule.'
+  parent: system.admin_content
+  route_name: y_pef_schedule.branches
+
+y_pef_schedule.settings:
+  title: 'Schedules calendar settings'
+  parent: openy_system.openy_settings
+  description: 'Configure Schedules Calendar.'
+  route_name: fullcalendar.settings
+  weight: 150
