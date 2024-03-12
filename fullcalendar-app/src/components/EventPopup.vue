@@ -75,7 +75,11 @@
 <script>
 import axios from 'axios';
 import Select2 from 'vue3-select2-component';
-import { UPDATE_EVENT_ENDPOINT, CREATE_EVENT_ENDPOINT } from '@/config/apiConfig';
+import {
+  UPDATE_EVENT_ENDPOINT,
+  CREATE_EVENT_ENDPOINT,
+  API_BASE_URL,
+} from '@/config/apiConfig';
 
 export default {
   name: 'EventPopup',
@@ -195,7 +199,7 @@ export default {
       try {
         const url = eventData.nid ? UPDATE_EVENT_ENDPOINT : CREATE_EVENT_ENDPOINT;
 
-        const response = await axios.post(url, eventData);
+        const response = await axios.post(API_BASE_URL + url, eventData);
         if (response.status === 200) {
           if (response.data.id) {
             eventData.nid = response.data.id;
