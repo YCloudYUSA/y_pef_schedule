@@ -52,6 +52,9 @@ import { format } from 'date-fns';
 
 import dayGridPlugin from '@fullcalendar/daygrid'
 import listPlugin from '@fullcalendar/list'
+import {
+  GET_SCHEDULES_CATEGORIES,
+} from '@/config/apiConfig';
 
 export default {
   name: 'EventsFullCalendar',
@@ -438,7 +441,7 @@ export default {
       calendarApi.gotoDate(startDate);
     },
     loadCategories() {
-      axios.get('/fullcalendar-api/get-schedules-categories')
+      axios.get(GET_SCHEDULES_CATEGORIES)
         .then(response => {
           this.categories = response.data
         })
