@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL, SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig';
+import { SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig';
 
 export default class EventService {
 
@@ -32,7 +32,7 @@ export default class EventService {
     const branchID = this.getBranchId();
 
     const categoryParams = categories.length > 0 ? '/' + categories.join(',') : '';
-    const url = `${API_BASE_URL}${SCHEDULES_ENDPOINT}/${branchID}/${formattedStart}/${formattedEnd}${categoryParams}`;
+    const url = `${SCHEDULES_ENDPOINT}/${branchID}/${formattedStart}/${formattedEnd}${categoryParams}`;
 
     try {
       const response = await axios.get(url);
@@ -98,7 +98,7 @@ export default class EventService {
    */
   async updateEventOnServer(eventData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}${UPDATE_EVENT_ENDPOINT}`, eventData);
+      const response = await axios.post(`${UPDATE_EVENT_ENDPOINT}`, eventData);
       if (response.status === 200) {
         return response.data;
       }

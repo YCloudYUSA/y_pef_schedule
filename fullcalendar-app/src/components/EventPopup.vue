@@ -78,7 +78,8 @@ import Select2 from 'vue3-select2-component';
 import {
   UPDATE_EVENT_ENDPOINT,
   CREATE_EVENT_ENDPOINT,
-  API_BASE_URL,
+  GET_CLASSES_OPTIONS,
+  GET_BRANCHES_OPTIONS,
 } from '@/config/apiConfig';
 
 export default {
@@ -137,7 +138,7 @@ export default {
       this.handleClose();
     },
     loadClasses() {
-      axios.get('/fullcalendar-api/get-classes-options')
+      axios.get(GET_CLASSES_OPTIONS)
         .then(response => {
           this.selectClasses = Object.entries(response.data).map(([id, title]) => ({
             id: id,
@@ -154,7 +155,7 @@ export default {
         });
     },
     loadLocations() {
-      axios.get('/fullcalendar-api/get-branches-options')
+      axios.get(GET_BRANCHES_OPTIONS)
         .then(response => {
           this.selectLocations = Object.entries(response.data).map(([id, title]) => ({
             id: id,
@@ -199,7 +200,7 @@ export default {
       try {
         const url = eventData.nid ? UPDATE_EVENT_ENDPOINT : CREATE_EVENT_ENDPOINT;
 
-        const response = await axios.post(API_BASE_URL + url, eventData);
+        const response = await axios.post(url, eventData);
         if (response.status === 200) {
           if (response.data.id) {
             eventData.nid = response.data.id;
