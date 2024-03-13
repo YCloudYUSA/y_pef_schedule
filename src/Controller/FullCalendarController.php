@@ -159,7 +159,7 @@ class FullCalendarController extends ControllerBase {
     $node_storage = $this->entityTypeManager->getStorage('node');
     /** @var \Drupal\node\NodeInterface $node */
     $node = $node_storage->load($event_data['nid']);
-    if ($event_data['title']) {
+    if (isset($event_data['title']) && $event_data['title']) {
       $node->setTitle($event_data['title']);
     }
 
@@ -211,14 +211,14 @@ class FullCalendarController extends ControllerBase {
    *   A JsonResponse object containing the 'id' of the updated session.
    */
   public function changeSession(EntityInterface $session, array $data): JsonResponse {
-    if ($data['eventClass']) {
+    if (isset($data['eventClass']) && $data['eventClass']) {
       $session->set('field_session_class', [
         'target_id' => $data['eventClass'],
         'target_revision_id' => $data['eventClass'],
       ]);
     }
 
-    if ($data['locationId']) {
+    if (isset($data['locationId']) && $data['locationId']) {
       $session->set('field_session_location', ['target_id' => $data['locationId']]);
     }
 
@@ -287,7 +287,7 @@ class FullCalendarController extends ControllerBase {
       $time_paragraph->isNew();
     }
 
-    if ($scheduleData['days']) {
+    if (isset($scheduleData['days']) && $scheduleData['days']) {
       $time_paragraph->set('field_session_time_days', explode(',', $scheduleData['days']));
     }
 
