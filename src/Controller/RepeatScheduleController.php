@@ -231,11 +231,22 @@ class RepeatScheduleController extends RepeatController {
     $subquery = $this->database->select('node__field_session_time', 'nft');
     $subquery->innerJoin('paragraph__field_session_time_days', 'ptd', 'ptd.entity_id = nft.field_session_time_target_id');
     $subquery->innerJoin('paragraph__field_session_time_date', 'psd', 'psd.entity_id = nft.field_session_time_target_id');
+
+    // Assuming 'nft.field_session_time_target_id' uniquely identifies each
+    // 'nft.entity_id', and thus, each set of fields you're selecting, we
+    // include all the fields directly. This does not change the logic but
+    // makes it compliant with ONLY_FULL_GROUP_BY.
     $subquery->addField('nft', 'entity_id', 'id');
     $subquery->addField('psd', 'field_session_time_date_value', 'start_date');
     $subquery->addField('psd', 'field_session_time_date_end_value', 'end_date');
-    $subquery->addExpression('GROUP_CONCAT(ptd.field_session_time_days_value)', 'days');
+    $subquery->addExpression('GROUP_CONCAT(DISTINCT ptd.field_session_time_days_value ORDER BY ptd.field_session_time_days_value)', 'days');
     $subquery->groupBy('nft.field_session_time_target_id');
+
+    // Important: Also group by the additional fields to be fully compliant.
+    $subquery->groupBy('nft.entity_id');
+    $subquery->groupBy('psd.field_session_time_date_value');
+    $subquery->groupBy('psd.field_session_time_date_end_value');
+
     $query->leftJoin($subquery, 'sq', 're.session = sq.id');
   }
 

@@ -180,8 +180,9 @@ export default {
       // We are forced to clone the calendar in order to modify its elements
       // before transferring to the PDF, otherwise, the user will see changes
       // on the page when the PDF is loaded.
-      const element = document.getElementById('fullcalendar-app'); // The original element of the calendar.
-      const clone = element.cloneNode(true); // Create a deep copy of an element
+      const element = document.getElementById('fullcalendar-app');
+      // Create a deep copy of an element.
+      const clone = element.cloneNode(true);
 
       // Get the text from the calendar header.
       const scheduleTitle = document.querySelector('.fc-toolbar-title').textContent;
@@ -192,6 +193,13 @@ export default {
       clone.style.marginTop = '10px';
       clone.style.marginLeft = '25px';
       clone.style.marginRight = '25px';
+
+      let tables = clone.querySelectorAll('.fc-timeGridWeek-view table');
+      if (tables.length) {
+        tables.forEach((table) => {
+          table.style.maxWidth = '1488px';
+        });
+      }
 
       const calendarBranchHeader = clone.querySelectorAll('.calendar-branch-header')[0];
       if (calendarBranchHeader.length) {
@@ -204,12 +212,14 @@ export default {
       if (clone.querySelectorAll('.fc-listDay-view').length) {
         clone.querySelectorAll('.fc-listDay-view')[0].style.position = 'relative';
         clone.querySelectorAll('.fc-listDay-view table')[0].style.marginBottom = '0';
-        clone.querySelectorAll('.fc-listDay-view tbody td').forEach(function(element) {
-          element.style.height = '3rem';
+        clone.querySelectorAll('.fc-listDay-view tbody td')
+          .forEach(function(element) {
+            element.style.height = '3rem';
         });
       }
 
-      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4').forEach(function(element) {
+      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4')
+        .forEach(function(element) {
         element.style.display = 'none';
       });
 
