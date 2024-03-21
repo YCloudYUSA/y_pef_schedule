@@ -264,10 +264,10 @@ export default {
 
   .modal-dialog {
     max-width: 500px;
-    margin: 1.5rem auto;
+    margin: 3.5rem auto;
 
-    @media (min-width: 576px) {
-      margin: 30px auto;
+    @media (max-width: 1550px) {
+      margin: 100px auto;
     }
   }
 
