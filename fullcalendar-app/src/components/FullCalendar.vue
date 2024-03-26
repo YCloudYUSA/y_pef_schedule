@@ -267,10 +267,14 @@ export default {
       }
     },
     handleSelect(selectInfo) {
+      // 'monday', 'tuesday', ...
+      const clickedDay = format(selectInfo.start, 'EEEE').toLowerCase();
+
       this.selectedEvent = {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         location: this.eventService.getBranchTitle(),
+        clickedDay: clickedDay,
       };
 
       this.openPopup('eventPopup')

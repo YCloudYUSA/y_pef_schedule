@@ -130,6 +130,11 @@ export default {
         };
         this.event.startGlobal =  this.event.startGlobal ? this.formatDateTimeLocal(newVal.startGlobal) : this.event.start
         this.event.endGlobal =  this.event.endGlobal ? this.formatDateTimeLocal(newVal.endGlobal) : this.event.end
+
+        // Automatic selection of the clicked day.
+        if (newVal.clickedDay) {
+          this.event.days = [newVal.clickedDay];
+        }
       }
     }
   },
