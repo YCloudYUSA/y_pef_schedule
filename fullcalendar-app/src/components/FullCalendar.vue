@@ -95,7 +95,7 @@ export default {
         eventResizableFromStart: false,
         selectable: true,
         selectAllow: this.checkSameDaySelection,
-        selectMirror: true,
+        selectMirror: false,
         weekends: true,
         dayMaxEvents: false,
         events: null,
@@ -106,6 +106,9 @@ export default {
         snapDuration: '00:30:00',
         // Timestamps every hour.
         slotLabelInterval: '01:00',
+        slotMinTime: '04:00:00',
+        slotMaxTime: '23:00:00',
+        contentHeight: 'auto',
         timeZone: 'local',
         nowIndicator: true,
         slotLabelFormat: {
@@ -172,41 +175,73 @@ export default {
         this.calendarOptions.slotDuration = window.drupalSettings.fullCalendar.slotDuration;
         this.calendarOptions.snapDuration = window.drupalSettings.fullCalendar.snapDuration;
         this.calendarOptions.slotLabelInterval = window.drupalSettings.fullCalendar.slotLabelInterval;
+
+        // Also update minTime and maxTime
+        this.calendarOptions.slotMinTime = window.drupalSettings.fullCalendar.minTime || '05:00:00';
+        this.calendarOptions.slotMaxTime = window.drupalSettings.fullCalendar.maxTime || '23:00:00';
       }
     });
   },
   methods: {
     downloadPDF() {
-      // We are forced to clone the calendar in order to modify its elements
-      // before transferring to the PDF, otherwise, the user will see changes
-      // on the page when the PDF is loaded.
-      const element = document.getElementById('fullcalendar-app');
-      // Create a deep copy of an element.
-      const clone = element.cloneNode(true);
+      const calendarClone = this.prepareCalendarClone();
+      this.addCloneToDOM(calendarClone);
 
-      // Get the text from the calendar header.
-      const scheduleTitle = document.querySelector('.fc-toolbar-title').textContent;
-      const fileName = `Weekly schedule (${scheduleTitle}).pdf`;
+      this.generatePDF(calendarClone).then(({ pdf, filename }) => {
+        pdf.save(filename);
+      }).catch(this.handlePDFGenerationError).finally(() => {
+        this.cleanUp(calendarClone);
+      });
+    },
+    prepareCalendarClone() {
+      const originalCalendar = document.getElementById('fullcalendar-app');
+      const calendarClone = originalCalendar.cloneNode(true);
 
-      // Setting styles for copy.
+      this.applyCustomStyles(calendarClone);
+      this.adjustCalendarLayout(calendarClone);
+      this.cleanupUnwantedElements(calendarClone);
+
+      return calendarClone;
+    },
+    applyCustomStyles(clone) {
       clone.style.padding = '0';
       clone.style.marginTop = '10px';
       clone.style.marginLeft = '25px';
       clone.style.marginRight = '25px';
+    },
+    adjustCalendarLayout(clone) {
+      let harness = clone.querySelectorAll('.fc-view-harness.fc-view-harness-active')[0];
+      if (harness) {
+        harness.style.minHeight = '1000px';
+        harness.style.maxHeight = '1020px';
+      }
 
       let tables = clone.querySelectorAll('.fc-timeGridWeek-view table');
       if (tables.length) {
         tables.forEach((table) => {
+          // Apply fixed width for the cloned calendar to standardize layout
           table.style.maxWidth = '1488px';
+          table.style.minWidth = '1488px';
         });
       }
 
-      const calendarBranchHeader = clone.querySelectorAll('.calendar-branch-header')[0];
-      if (calendarBranchHeader.length) {
-        calendarBranchHeader.style.padding = '0';
-        calendarBranchHeader.style.fontSize = '10px';
-        calendarBranchHeader.style.position = 'absolute';
-        calendarBranchHeader.style.right = '30px';
+      let headerCells = clone.querySelectorAll('#fullcalendar-app th.fc-col-header-cell, #fullcalendar-app th');
+      if (headerCells.length) {
+        headerCells.forEach((cell) => {
+          cell.style.padding = '0';
+          cell.style.height = '1rem';
+        });
+      }
+      let tableColHeader = clone.querySelectorAll('table.fc-col-header')[0];
+      if (tableColHeader) {
+        tableColHeader.style.margin = '0';
+      }
+
+      let dateText = clone.querySelectorAll('#fullcalendar-app .fc-header-toolbar')[0];
+      if (dateText) {
+        dateText.style.position = 'absolute';
+        dateText.style.top = '0';
+        dateText.style.right = '0';
       }
 
       if (clone.querySelectorAll('.fc-listDay-view').length) {
@@ -215,23 +250,34 @@ export default {
         clone.querySelectorAll('.fc-listDay-view tbody td')
           .forEach(function(element) {
             element.style.height = '3rem';
-        });
+          });
       }
-
-      clone.querySelectorAll('.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4')
-        .forEach(function(element) {
+    },
+    cleanupUnwantedElements(clone) {
+      const elementsToHide = clone.querySelectorAll(
+        '.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4'
+      );
+      elementsToHide.forEach(element => {
         element.style.display = 'none';
       });
-
-      // Adding copy to the DOM for PDF generation. The copy will be deleted immediately, so the user will not see the change.
+    },
+    addCloneToDOM(clone) {
       document.body.appendChild(clone);
+    },
+    generatePDF(clone) {
+      const scheduleTitle = document.querySelector('.fc-toolbar-title').textContent;
+      const filename = `Weekly schedule (${scheduleTitle}).pdf`;
 
-      // Setting parameters for html2pdf.
-      const options = {
+      const pdfOptions = {
         margin: [3, 5],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.99 },
-        html2canvas: { scale: 2, useCORS: true },
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          logging: false,
+          dpi: 192,
+          letterRendering: true,
+        },
         jsPDF: {
           unit: 'mm',
           format: 'a3',
@@ -240,21 +286,20 @@ export default {
         }
       };
 
-      // Generate PDF from copy.
-      html2pdf().from(clone).set(options).toPdf().get('pdf').then(function (pdf) {
-        // Removing a copy from the DOM after creating a PDF.
-        document.body.removeChild(clone);
-        pdf.save(options.filename);
-      }).catch(function(error) {
-        console.error('Error creating PDF. Action needed:', {
-          message: 'Failed to create a PDF document from the provided HTML content. An error occurred during the PDF generation process.',
-          action: 'Check if all dependencies for the html2pdf library are correctly loaded and ensure the HTML structure provided to the library does not contain any elements or attributes that could cause the generation to fail.',
-          errorDetails: error.message || error,
-          tip: 'Review any warnings or errors in the console related to html2pdf or its dependencies. Consider testing the PDF generation process with a simplified HTML structure to isolate the issue. If the problem persists, you might need to explore alternative PDF generation libraries or methods that suit your specific requirements better.'
-        });
-        // Make sure the copy is deleted even in case of error.
-        document.body.removeChild(clone);
+      return html2pdf().set(pdfOptions).from(clone).toPdf().get('pdf').then((pdf) => {
+        return { pdf, filename }
       });
+    },
+    handlePDFGenerationError(error) {
+      console.error('Error creating PDF. Action needed:', {
+        message: 'Failed to create a PDF document from the provided HTML content. An error occurred during the PDF generation process.',
+        action: 'Check if all dependencies for the html2pdf library are correctly loaded and ensure the HTML structure provided to the library does not contain any elements or attributes that could cause the generation to fail.',
+        errorDetails: error.message || error,
+        tip: 'Review any warnings or errors in the console related to html2pdf or its dependencies. Consider testing the PDF generation process with a simplified HTML structure to isolate the issue. If the problem persists, you might need to explore alternative PDF generation libraries or methods that suit your specific requirements better.'
+      });
+    },
+    cleanUp(clone) {
+      document.body.removeChild(clone);
     },
     openPopup(type) { this.activeModal = type; },
     closePopup() { this.activeModal = null; },
@@ -363,7 +408,16 @@ export default {
         startGlobal: combineDateTime(eventInfo.event.extendedProps.startGlobal, eventInfo.event.start),
         endGlobal: combineDateTime(eventInfo.event.extendedProps.endGlobal, eventInfo.event.end),
       };
-       this.eventService.updateEventOnServer(event);
+       this.eventService.updateEventOnServer(event)
+         .then(updatedEvent => {
+           // Use the updated event data to update the event in FullCalendar
+           let calendarApi = this.$refs.fullCalendar.getApi();
+           let eventToUpdate = calendarApi.getEventById(event.id);
+           if (eventToUpdate) {
+             eventToUpdate.setProp('start', new Date(updatedEvent.start));
+             eventToUpdate.setProp('end', new Date(updatedEvent.end));
+           }
+         })
     },
     getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);

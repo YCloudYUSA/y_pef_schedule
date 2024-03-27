@@ -65,6 +65,24 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       '#description' => $this->t('The slotLabelInterval setting specifies the interval between time labels displayed along the calendar\'s axis (e.g., "01:00" for every hour).'),
     ];
 
+    $form['time'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Time settings'),
+      '#open' => TRUE,
+    ];
+    $form['time']['min_time'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Min Time'),
+      '#default_value' => $config->get('min_time') ?? '04:00:00',
+      '#description' => $this->t('The starting time that will be displayed on the calendar.'),
+    ];
+    $form['time']['max_time'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Max Time'),
+      '#default_value' => $config->get('max_time') ?? '23:00:00',
+      '#description' => $this->t('The end time that will be displayed on the calendar.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -76,6 +94,8 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       ->set('slot_duration', $form_state->getValue('slot_duration'))
       ->set('snap_duration', $form_state->getValue('snap_duration'))
       ->set('slot_label_interval', $form_state->getValue('slot_label_interval'))
+      ->set('min_time', $form_state->getValue('min_time'))
+      ->set('max_time', $form_state->getValue('max_time'))
       ->save();
 
     parent::submitForm($form, $form_state);
