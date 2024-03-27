@@ -74,13 +74,13 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Min Time'),
       '#default_value' => $config->get('min_time') ?? '04:00:00',
-      '#description' => $this->t('The starting time that will be displayed on the calendar.'),
+      '#description' => $this->t('Enter the earliest time in HH:MM:SS format that you want to be visible in the calendar’s view. This setting helps to limit the view to specific hours, making the calendar more relevant to the user’s needs.'),
     ];
     $form['time']['max_time'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Max Time'),
       '#default_value' => $config->get('max_time') ?? '23:00:00',
-      '#description' => $this->t('The end time that will be displayed on the calendar.'),
+      '#description' => $this->t('Enter the latest time in HH:MM:SS format that you want to be visible in the calendar’s view. This time represents the cutoff point at which the calendar view will stop displaying events for the day.'),
     ];
 
     return parent::buildForm($form, $form_state);

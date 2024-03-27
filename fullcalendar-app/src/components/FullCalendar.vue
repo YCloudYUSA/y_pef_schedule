@@ -177,7 +177,7 @@ export default {
         this.calendarOptions.slotLabelInterval = window.drupalSettings.fullCalendar.slotLabelInterval;
 
         // Also update minTime and maxTime
-        this.calendarOptions.slotMinTime = window.drupalSettings.fullCalendar.minTime || '05:00:00';
+        this.calendarOptions.slotMinTime = window.drupalSettings.fullCalendar.minTime || '04:00:00';
         this.calendarOptions.slotMaxTime = window.drupalSettings.fullCalendar.maxTime || '23:00:00';
       }
     });
@@ -199,66 +199,32 @@ export default {
 
       this.applyCustomStyles(calendarClone);
       this.adjustCalendarLayout(calendarClone);
-      this.cleanupUnwantedElements(calendarClone);
 
       return calendarClone;
     },
     applyCustomStyles(clone) {
-      clone.style.padding = '0';
-      clone.style.marginTop = '10px';
-      clone.style.marginLeft = '25px';
-      clone.style.marginRight = '25px';
+      clone.classList.add('clone');
     },
     adjustCalendarLayout(clone) {
-      let harness = clone.querySelectorAll('.fc-view-harness.fc-view-harness-active')[0];
-      if (harness) {
-        harness.style.minHeight = '1000px';
-        harness.style.maxHeight = '1020px';
-      }
+      const elementsToAdjust = clone.querySelectorAll(`
+        .fc-view-harness.fc-view-harness-active,
+        .fc-timeGridWeek-view table,
+        #fullcalendar-app th.fc-col-header-cell,
+        #fullcalendar-app th,
+        table.fc-col-header,
+        #fullcalendar-app .fc-header-toolbar,
+        .fc-listDay-view,
+        .fc-listDay-view tbody td,
+        .fc-listDay-view,
+        .fc-listDay-view tbody td,
+        .fullcalendar--header,
+        .fc-header-toolbar .fc-toolbar-chunk:not(:first-child),
+        .calendar-branch-info h4
+      `);
 
-      let tables = clone.querySelectorAll('.fc-timeGridWeek-view table');
-      if (tables.length) {
-        tables.forEach((table) => {
-          // Apply fixed width for the cloned calendar to standardize layout
-          table.style.maxWidth = '1488px';
-          table.style.minWidth = '1488px';
-        });
-      }
-
-      let headerCells = clone.querySelectorAll('#fullcalendar-app th.fc-col-header-cell, #fullcalendar-app th');
-      if (headerCells.length) {
-        headerCells.forEach((cell) => {
-          cell.style.padding = '0';
-          cell.style.height = '1rem';
-        });
-      }
-      let tableColHeader = clone.querySelectorAll('table.fc-col-header')[0];
-      if (tableColHeader) {
-        tableColHeader.style.margin = '0';
-      }
-
-      let dateText = clone.querySelectorAll('#fullcalendar-app .fc-header-toolbar')[0];
-      if (dateText) {
-        dateText.style.position = 'absolute';
-        dateText.style.top = '0';
-        dateText.style.right = '0';
-      }
-
-      if (clone.querySelectorAll('.fc-listDay-view').length) {
-        clone.querySelectorAll('.fc-listDay-view')[0].style.position = 'relative';
-        clone.querySelectorAll('.fc-listDay-view table')[0].style.marginBottom = '0';
-        clone.querySelectorAll('.fc-listDay-view tbody td')
-          .forEach(function(element) {
-            element.style.height = '3rem';
-          });
-      }
-    },
-    cleanupUnwantedElements(clone) {
-      const elementsToHide = clone.querySelectorAll(
-        '.fullcalendar--header, .fc-header-toolbar .fc-toolbar-chunk:not(:first-child), .calendar-branch-info h4'
-      );
-      elementsToHide.forEach(element => {
-        element.style.display = 'none';
+      // Add the 'clone' class to all elements in the NodeList
+      elementsToAdjust.forEach(element => {
+        element.classList.add('clone');
       });
     },
     addCloneToDOM(clone) {
@@ -266,7 +232,7 @@ export default {
     },
     generatePDF(clone) {
       const scheduleTitle = document.querySelector('.fc-toolbar-title').textContent;
-      const filename = `Weekly schedule (${scheduleTitle}).pdf`;
+      const filename = `Weekly-schedule--(${scheduleTitle}).pdf`;
 
       const pdfOptions = {
         margin: [3, 5],

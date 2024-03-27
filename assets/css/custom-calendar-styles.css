@@ -79,3 +79,53 @@
 .fc-timegrid-event .fc-event-main {
   line-height: 1.2;
 }
+
+/*** Styles applied to the FullCalendar clone used for PDF generation ***/
+
+#fullcalendar-app.clone {
+  padding: 0;
+  margin-top: 10px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+/* Ensures that the cloned calendar harness has fixed height to prevent excessive height in the PDF */
+.fc-view-harness.fc-view-harness-active.clone {
+  min-height: 1000px;
+  max-height: 1020px;
+}
+/* Standardizes the width of tables in the cloned week view to fit the PDF layout */
+.fc-timeGridWeek-view table.clone {
+  min-width: 1488px;
+  max-width: 1488px;
+}
+/* Adjusts the header cells of the cloned calendar for a compact appearance in the PDF */
+#fullcalendar-app th.fc-col-header-cell.clone,
+#fullcalendar-app th.clone {
+  padding: 0;
+  height: 1rem;
+}
+/* Removes margin from the cloned table headers for a consistent layout in the PDF */
+table.fc-col-header.clone {
+  margin: 0;
+}
+/* Positions the cloned calendar header in the top-right corner, ensuring it doesn't overlap with the calendar events */
+#fullcalendar-app .fc-header-toolbar.clone {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+/* Fixes the layout of the listDay view in the cloned calendar for a standardized look in the PDF */
+.fc-listDay-view.clone {
+  position: relative;
+  margin-bottom: 0;
+}
+/* Ensures a consistent height for the cells in the listDay view, leading to a neater presentation in the PDF */
+.fc-listDay-view tbody td.clone {
+  height: 3rem;
+}
+/* Hides additional headers and controls in the cloned calendar for a cleaner PDF output */
+#fullcalendar-app .fullcalendar--header.clone,
+.fc-header-toolbar .fc-toolbar-chunk.clone,
+.calendar-branch-info h4.clone {
+  display: none;
+}
