@@ -126,6 +126,8 @@ class FullCalendarController extends ControllerBase {
       'slotDuration' => $fullcalendar_settings->get('slot_duration'),
       'snapDuration' => $fullcalendar_settings->get('snap_duration'),
       'slotLabelInterval' => $fullcalendar_settings->get('slot_label_interval'),
+      'minTime' => $fullcalendar_settings->get('min_time'),
+      'maxTime' => $fullcalendar_settings->get('max_time'),
     ];
 
     return $build;
