@@ -27,16 +27,16 @@ function y_pef_schedule_uninstall(): void {
 /**
  * Creates required fields for the module.
  *
- * This function defines and saves the 'field_session_color' field storage and
- * field config for nodes of type 'session', which is used to store color
- * information for sessions.
+ * This function defines and saves the 'field_activity_color' field storage and
+ * field config for nodes of type 'activity', which is used to store color
+ * information for activitys.
  *
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function _y_pef_schedule_create_fields(): void {
-  // Define and save field storage for 'Session color'.
+  // Define and save field storage for 'activity color'.
   FieldStorageConfig::create([
-    'field_name' => 'field_session_color',
+    'field_name' => 'field_activity_color',
     'entity_type' => 'node',
     'type' => 'string',
     'settings' => [
@@ -45,24 +45,24 @@ function _y_pef_schedule_create_fields(): void {
     'cardinality' => 1,
   ])->save();
 
-  // Define and save field configuration for 'Session color'.
+  // Define and save field configuration for 'activity color'.
   FieldConfig::create([
-    'field_name' => 'field_session_color',
+    'field_name' => 'field_activity_color',
     'entity_type' => 'node',
-    'bundle' => 'session',
-    'label' => 'Session color',
+    'bundle' => 'activity',
+    'label' => 'Activity color',
     'description' => 'Specifies the hex color for the event.',
   ])->save();
 
-  // Update display settings for the 'Session color' field.
+  // Update display settings for the 'activity color' field.
   _y_pef_schedule_update_displays_on_install();
 }
 
 /**
- * Updates display settings for 'Session' content type upon module installation.
+ * Updates display settings for 'activity' content type upon module installation.
  *
- * Specifically, updates the form display settings for the 'Session color' field
- * to ensure it is properly displayed in the session node form.
+ * Specifically, updates the form display settings for the 'activity color' field
+ * to ensure it is properly displayed in the activity node form.
  *
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
@@ -70,9 +70,9 @@ function _y_pef_schedule_update_displays_on_install(): void {
   /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
   $entity_display_repository = \Drupal::service('entity_display.repository');
 
-  // Retrieve and update the form display for 'session' nodes.
-  $form_display = $entity_display_repository->getFormDisplay('node', 'session');
-  $form_display->setComponent('field_session_color', [
+  // Retrieve and update the form display for 'activity' nodes.
+  $form_display = $entity_display_repository->getFormDisplay('node', 'activity');
+  $form_display->setComponent('field_activity_color', [
     'type' => 'string_textfield',
     'settings' => [
       'display_label' => TRUE,
@@ -84,16 +84,16 @@ function _y_pef_schedule_update_displays_on_install(): void {
 /**
  * Removes fields created by the module.
  *
- * Deletes both the field config and field storage for 'field_session_color',
+ * Deletes both the field config and field storage for 'field_activity_color',
  * cleaning up any data and configurations associated with this field.
  *
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function _y_pef_schedule_remove_fields(): void {
-  $field_name = 'field_session_color';
+  $field_name = 'field_activity_color';
 
   // Delete field configuration.
-  $field_config = FieldConfig::loadByName('node', 'session', $field_name);
+  $field_config = FieldConfig::loadByName('node', 'activity', $field_name);
   $field_config?->delete();
 
   // Delete field storage.

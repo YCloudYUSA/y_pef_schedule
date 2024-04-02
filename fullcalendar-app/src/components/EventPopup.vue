@@ -58,11 +58,6 @@
                   </label>
                 </div>
               </div>
-
-              <div class="mt-2">
-                <input type="color" class="form-control form-control-color" id="color" v-model="event.colorEvent" name="color" title="Choose a color">
-              </div>
-
               <button type="submit" class="btn btn-success mt-3">{{this.event.label}}</button>
             </form>
           </div>
@@ -124,7 +119,6 @@ export default {
           ...newVal,
           start: this.formatDateTimeLocal(newVal.start),
           end: this.formatDateTimeLocal(newVal.end),
-          colorEvent: newVal.colorEvent || '#3788d8',
           days: newVal.days ? newVal.days.split(',') : [],
           label: this.event.nid ? 'Update' : 'Create',
         };
@@ -209,6 +203,7 @@ export default {
         if (response.status === 200) {
           if (response.data.id) {
             eventData.nid = response.data.id;
+            eventData.color = response.data.color;
           }
 
           this.$emit('save', eventData);
@@ -224,7 +219,6 @@ export default {
       }
     },
     submitEvent() {
-      this.event.color = this.event.colorEvent;
       this.sendEventToServer(this.event);
     },
     handleClose() {

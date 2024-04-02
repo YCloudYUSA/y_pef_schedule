@@ -229,7 +229,10 @@ class FullCalendarController extends ControllerBase {
     $this->setFieldsSession($session, $data);
     $session->save();
 
-    return new JsonResponse(['id' => $session->id()]);
+    $class = $session->get('field_session_class')->entity;
+    $activity = $class->get('field_class_activity')->entity;
+    $color = $activity->get('field_activity_color')->value ??  $this->getDefaultColor();
+    return new JsonResponse(['id' => $session->id(), 'color' => $color]);
   }
 
   /**
@@ -251,7 +254,6 @@ class FullCalendarController extends ControllerBase {
       'field_session_room' => 'room',
       'field_session_instructor' => 'field_session_instructor',
       'field_session_description' => 'description',
-      'field_session_color' => 'colorEvent',
     ];
     foreach ($fields as $key => $dataKey) {
       if (!empty($data[$dataKey])) {
@@ -418,6 +420,8 @@ class FullCalendarController extends ControllerBase {
     $query = $this->database->select('node_field_data', 'n');
     $query->fields('n', ['nid', 'title']);
     $query->condition('n.status', NodeInterface::PUBLISHED);
+    $query->leftJoin('node__field_activity_color', 'nc', 'nc.entity_id = n.nid');
+    $query->addField('nc', 'field_activity_color_value', 'color');
     $query->condition('n.type', 'activity');
     $query->orderBy('n.title');
     $result = $query->execute();
@@ -425,15 +429,23 @@ class FullCalendarController extends ControllerBase {
     $categories = [];
     foreach ($result as $record) {
       // TODO: We assume that the color will be determined later, so for now we put a placeholder.
-      $color = '#FFD700';
 
       $categories[] = [
         'name' => $record->title,
-        'color' => $color,
+        'color' => $record->color ?? $this->getDefaultColor(),
       ];
     }
 
     return new JsonResponse($categories);
+  }
+
+  /**
+   * Get default color event if color not set in activity node
+   *
+   * @return string color event
+   */
+  public static function getDefaultColor() {
+    return '#3788d8';
   }
 
 }
