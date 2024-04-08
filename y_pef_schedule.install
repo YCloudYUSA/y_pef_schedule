@@ -34,16 +34,6 @@ function y_pef_schedule_uninstall(): void {
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function _y_pef_schedule_create_fields(): void {
-  // Define and save field storage for 'activity color'.
-  FieldStorageConfig::create([
-    'field_name' => 'field_activity_color',
-    'entity_type' => 'node',
-    'type' => 'string',
-    'settings' => [
-      'max_length' => 255,
-    ],
-    'cardinality' => 1,
-  ])->save();
 
   // Define and save field configuration for 'activity color'.
   FieldConfig::create([
