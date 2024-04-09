@@ -445,7 +445,8 @@ class FullCalendarController extends ControllerBase {
    * @return string color event
    */
   public static function getDefaultColor() {
-    return '#3788d8';
+    $fullcalendar_settings = \Drupal::configFactory()->get('y_pef_schedule.settings');
+    return $fullcalendar_settings->get('default_color');
   }
 
 }
