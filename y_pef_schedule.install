@@ -12,8 +12,8 @@ use Drupal\field\Entity\FieldConfig;
  * Implements hook_install().
  */
 function y_pef_schedule_install(): void {
-  // Create custom fields required by the module.
-  _y_pef_schedule_create_fields();
+  // Update display settings for the 'activity color' field.
+  _y_pef_schedule_update_displays_on_install();
 }
 
 /**
@@ -22,30 +22,6 @@ function y_pef_schedule_install(): void {
 function y_pef_schedule_uninstall(): void {
   // Remove custom fields created by the module.
   _y_pef_schedule_remove_fields();
-}
-
-/**
- * Creates required fields for the module.
- *
- * This function defines and saves the 'field_activity_color' field storage and
- * field config for nodes of type 'activity', which is used to store color
- * information for activitys.
- *
- * @throws \Drupal\Core\Entity\EntityStorageException
- */
-function _y_pef_schedule_create_fields(): void {
-
-  // Define and save field configuration for 'activity color'.
-  FieldConfig::create([
-    'field_name' => 'field_activity_color',
-    'entity_type' => 'node',
-    'bundle' => 'activity',
-    'label' => 'Activity color',
-    'description' => 'Specifies the hex color for the event.',
-  ])->save();
-
-  // Update display settings for the 'activity color' field.
-  _y_pef_schedule_update_displays_on_install();
 }
 
 /**
@@ -63,7 +39,7 @@ function _y_pef_schedule_update_displays_on_install(): void {
   // Retrieve and update the form display for 'activity' nodes.
   $form_display = $entity_display_repository->getFormDisplay('node', 'activity');
   $form_display->setComponent('field_activity_color', [
-    'type' => 'string_textfield',
+    'type' => 'colorapi_color_widget',
     'settings' => [
       'display_label' => TRUE,
     ],
