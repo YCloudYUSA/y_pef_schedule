@@ -66,10 +66,3 @@ function _y_pef_schedule_remove_fields(): void {
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   $field_storage?->delete();
 }
-
-/**
- * Implements hook_update_N().
- */
-function y_pef_schedule_update_9001(&$sandbox): void {
-  _y_pef_schedule_create_fields();
-}
