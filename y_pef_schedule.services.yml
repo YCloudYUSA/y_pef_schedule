@@ -1,0 +1,4 @@
+services:
+  y_pef_schedule.manager:
+    class: Drupal\y_pef_schedule\Service\RepeatScheduleManager
+    arguments: [ '@config.factory' ]

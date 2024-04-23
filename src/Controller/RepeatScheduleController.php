@@ -7,6 +7,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\openy_repeat\Controller\RepeatController;
+use Drupal\y_pef_schedule\Service\RepeatScheduleManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,12 +58,20 @@ class RepeatScheduleController extends RepeatController {
   protected LoggerInterface $logger;
 
   /**
+   * The RepeatScheduleManager service.
+   *
+   * @var \Drupal\y_pef_schedule\Service\RepeatScheduleManager
+   */
+  protected RepeatScheduleManager $scheduleManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): self {
     $instance = parent::create($container);
     $instance->configFactory = $container->get('config.factory');
     $instance->logger = $container->get('logger.factory')->get('y_pef_schedule');
+    $instance->scheduleManager = $container->get('y_pef_schedule.manager');
     return $instance;
   }
 
@@ -171,6 +180,7 @@ class RepeatScheduleController extends RepeatController {
       $item->description = strip_tags($item->description ?? '');
       $item->class_info = $classes_info[$item->class] ?? null;
 
+      $item->color = $item->color ?? $this->scheduleManager->getDefaultColor();
       // Simplify date conversion by creating a helper method if repeated logic
       $item->time_start_calendar_global = $this->convertDate($item->time_start_calendar_global, $tz_utc, $tz_default, 'Y-m-d H:i:s');
       $item->time_end_calendar_global = $this->convertDate($item->time_end_calendar_global, $tz_utc, $tz_default, 'Y-m-d H:i:s');
@@ -210,8 +220,10 @@ class RepeatScheduleController extends RepeatController {
     $query->leftJoin('node', 'n', 're.session = n.nid');
     $query->innerJoin('node_field_data', 'nd', 're.location = nd.nid');
     $query->innerJoin('node_field_data', 'nds', 'n.nid = nds.nid');
-    $query->leftJoin('node__field_session_color', 'nfc', 'n.nid = nfc.entity_id');
     $query->leftJoin('node__field_session_description', 'nfd', 'n.nid = nfd.entity_id');
+    $query->leftJoin('node__field_class_activity', 'nfca', 'nfca.entity_id = re.class');
+    $query->leftJoin('node__field_activity_color', 'nfac', 'nfca.field_class_activity_target_id  = nfac.entity_id');
+
     $this->addSubjoin($query);
   }
 
@@ -268,7 +280,7 @@ class RepeatScheduleController extends RepeatController {
     $query->addField('sq', 'days');
     $query->addField('sq', 'start_date', 'time_start_calendar_global');
     $query->addField('sq', 'end_date', 'time_end_calendar_global');
-    $query->addField('nfc', 'field_session_color_value', 'color');
+    $query->addField('nfac', 'field_activity_color_color', 'color');
     $query->addField('nfd', 'field_session_description_value', 'description');
     $query->fields('re', [
       'class',

@@ -11,6 +11,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\node\NodeInterface;
+use Drupal\y_pef_schedule\Service\RepeatScheduleManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +66,13 @@ class FullCalendarController extends ControllerBase {
   protected $configFactory;
 
   /**
+   * The RepeatScheduleManager service.
+   *
+   * @var \Drupal\y_pef_schedule\Service\RepeatScheduleManager
+   */
+  protected RepeatScheduleManager $scheduleManager;
+
+  /**
    * Constructs a CommentController object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -73,11 +81,19 @@ class FullCalendarController extends ControllerBase {
    *   The database service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    * *   The configuration factory.
+   * @param \Drupal\y_pef_schedule\Service\RepeatScheduleManager $schedule_manager
+   * *   The configuration factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, ConfigFactoryInterface $config_factory) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    Connection $database,
+    ConfigFactoryInterface $config_factory,
+    RepeatScheduleManager $schedule_manager
+  ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->database = $database;
     $this->configFactory = $config_factory;
+    $this->scheduleManager = $schedule_manager;
   }
 
   /**
@@ -87,7 +103,8 @@ class FullCalendarController extends ControllerBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('database'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('y_pef_schedule.manager')
     );
   }
 
@@ -229,7 +246,10 @@ class FullCalendarController extends ControllerBase {
     $this->setFieldsSession($session, $data);
     $session->save();
 
-    return new JsonResponse(['id' => $session->id()]);
+    $class = $session->get('field_session_class')->entity;
+    $activity = $class->get('field_class_activity')->entity;
+    $color = $activity->get('field_activity_color')->value ??  $this->scheduleManager->getDefaultColor();
+    return new JsonResponse(['id' => $session->id(), 'color' => $color]);
   }
 
   /**
@@ -251,7 +271,6 @@ class FullCalendarController extends ControllerBase {
       'field_session_room' => 'room',
       'field_session_instructor' => 'field_session_instructor',
       'field_session_description' => 'description',
-      'field_session_color' => 'colorEvent',
     ];
     foreach ($fields as $key => $dataKey) {
       if (!empty($data[$dataKey])) {
@@ -418,18 +437,17 @@ class FullCalendarController extends ControllerBase {
     $query = $this->database->select('node_field_data', 'n');
     $query->fields('n', ['nid', 'title']);
     $query->condition('n.status', NodeInterface::PUBLISHED);
+    $query->leftJoin('node__field_activity_color', 'nc', 'nc.entity_id = n.nid');
+    $query->addField('nc', 'field_activity_color_color', 'color');
     $query->condition('n.type', 'activity');
     $query->orderBy('n.title');
     $result = $query->execute();
 
     $categories = [];
     foreach ($result as $record) {
-      // TODO: We assume that the color will be determined later, so for now we put a placeholder.
-      $color = '#FFD700';
-
       $categories[] = [
         'name' => $record->title,
-        'color' => $color,
+        'color' => $record->color ?? $this->scheduleManager->getDefaultColor(),
       ];
     }
 

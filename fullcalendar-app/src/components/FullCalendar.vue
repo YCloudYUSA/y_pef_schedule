@@ -310,8 +310,7 @@ export default {
         calendarEvent.setProp('title', updatedEvent.title);
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
-        calendarEvent.setProp('color', updatedEvent.colorEvent);
-        calendarEvent.setExtendedProp('colorEvent', updatedEvent.colorEvent);
+        calendarEvent.setProp('color', updatedEvent.color);
         calendarEvent.setExtendedProp('description', updatedEvent.description);
         calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);
         calendarEvent.setExtendedProp('room', updatedEvent.room);
@@ -374,16 +373,16 @@ export default {
         startGlobal: combineDateTime(eventInfo.event.extendedProps.startGlobal, eventInfo.event.start),
         endGlobal: combineDateTime(eventInfo.event.extendedProps.endGlobal, eventInfo.event.end),
       };
-       this.eventService.updateEventOnServer(event)
-         .then(updatedEvent => {
-           // Use the updated event data to update the event in FullCalendar
-           let calendarApi = this.$refs.fullCalendar.getApi();
-           let eventToUpdate = calendarApi.getEventById(event.id);
-           if (eventToUpdate) {
-             eventToUpdate.setProp('start', new Date(updatedEvent.start));
-             eventToUpdate.setProp('end', new Date(updatedEvent.end));
-           }
-         })
+      this.eventService.updateEventOnServer(event)
+        .then(updatedEvent => {
+          // Use the updated event data to update the event in FullCalendar
+          let calendarApi = this.$refs.fullCalendar.getApi();
+          let eventToUpdate = calendarApi.getEventById(event.id);
+          if (eventToUpdate) {
+            eventToUpdate.setProp('start', new Date(updatedEvent.start));
+            eventToUpdate.setProp('end', new Date(updatedEvent.end));
+          }
+        })
     },
     getUrlParams() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -403,7 +402,6 @@ export default {
         start: clickInfo.event.start,
         end: clickInfo.event.end,
         room: clickInfo.event.extendedProps.room,
-        colorEvent: clickInfo.event.extendedProps.colorEvent,
         instructor: clickInfo.event.extendedProps.instructor,
         description: clickInfo.event.extendedProps.description,
         locationId: clickInfo.event.extendedProps.locationId,
