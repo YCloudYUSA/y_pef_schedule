@@ -1,6 +1,6 @@
 # Main library.
 y_pef_schedule-app:
-  version: 1.0
+  version: 1.1
   js:
     fullcalendar-app/dist/fullcalendar-app.umd.min.js: { minified: true }
   css:
