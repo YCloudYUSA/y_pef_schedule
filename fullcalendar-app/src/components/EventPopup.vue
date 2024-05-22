@@ -9,7 +9,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body p-4">
+          <div class="modal-body">
             <form @submit.prevent="submitEvent">
               <!-- nid: Hidden input for edit mode -->
               <input type="hidden" v-model="event.nid"/>
@@ -22,16 +22,18 @@
                 <Select2 :options="selectClasses" v-model="event.classId" required @change="changeClass($event)" @select="selectClass($event)" placeholder="Class"/>
               </div>
 
-              <div class="mb-3">
-                <input id="room" class="form-control" type="text" v-model="event.room" placeholder="Room"/>
+              <div class="row">
+                <div class="mb-2 col-md-6">
+                  <input id="room" class="form-control" type="text" v-model="event.room" placeholder="Room"/>
+                </div>
+
+                <div class="mb-2 col-md-6">
+                  <input class="form-control" type="text" v-model="event.instructor" placeholder="Instructor"/>
+                </div>
               </div>
 
               <div class="mb-3">
                 <Select2 class="mt-3" :options="selectLocations" required v-model="event.locationId" @change="changeLocation($event)" @select="selectEvent($event)" placeholder="Location"/>
-              </div>
-
-              <div class="mb-2">
-                <input class="form-control" type="text" v-model="event.instructor" placeholder="Instructor"/>
               </div>
 
               <div class="mb-2">
@@ -268,6 +270,10 @@ export default {
     @media (max-width: 1550px) {
       margin: 100px auto;
     }
+
+    .modal-title {
+      font-size: 18px;
+    }
   }
 
   .fc-modal-event {
@@ -275,11 +281,24 @@ export default {
       border-bottom: none;
       border-top-left-radius: unset;
       border-top-right-radius: unset;
+      padding: 10px;
     }
   }
 
   .modal-body {
-    padding: 1.5rem;
+    padding: 15px 20px;
+    overflow-y: auto;
+
+    .select2 {
+      .select2-selection__rendered {
+        font-size: 14px;
+      }
+    }
+
+    .form-label {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
   }
 
   .form-compact {
@@ -299,8 +318,15 @@ export default {
     background-color: #f9f9f9;
 
     h5 {
+      font-family: Avenir, Helvetica, Arial, sans-serif;
       grid-column: span 2;
       margin-top: 0;
+      font-size: 18px;
+    }
+
+    .form-check-label {
+      font-size: 12px;
+      padding-left: 5px;
     }
   }
 
@@ -355,4 +381,20 @@ export default {
     }
   }
 }
+.select2 {
+  &-container--default {
+    .select2-selection--single {
+      .select2-selection__rendered .select2-selection__placeholder {
+        color: #444;
+      }
+    }
+  }
+
+  &-results {
+    &__option[aria-selected] {
+      font-size: 16px;
+    }
+  }
+}
+
 </style>
