@@ -250,7 +250,10 @@ export default {
 .fullcalendar-app {
   .modal.show {
     display: block;
-    padding-right: 17px;
+
+      @media (min-width: 768px) {
+        padding-right: 17px;
+    }
   }
 
   .modal-backdrop {
@@ -265,10 +268,11 @@ export default {
 
   .modal-dialog {
     max-width: 500px;
-    margin: 3.5rem auto;
+    margin: 0 auto;
 
-    @media (max-width: 1550px) {
+    @media (min-width: 1550px) {
       margin: 100px auto;
+      top: -60px;
     }
 
     .modal-title {
@@ -311,15 +315,15 @@ export default {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
-    margin-top: 1rem;
-    padding: 1rem;
+    margin-top: 0.8rem;
+    padding: 0.6rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
 
     h5 {
       font-family: Avenir, Helvetica, Arial, sans-serif;
-      grid-column: span 2;
+      grid-column: span 1;
       margin-top: 0;
       font-size: 18px;
     }
