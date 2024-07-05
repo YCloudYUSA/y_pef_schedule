@@ -20,7 +20,7 @@ drush en y_pef_schedule
 
 1. Install as you would normally install a contributed Drupal module. For further information, see
    [Installing Drupal Modules](https://www.drupal.org/docs/extending-drupal/installing-drupal-modules).
-2. Enable the module by navigating to `Admin > Extend` in your Drupal admin interface, then enabling "Y PEF Schedules Admin tool"
+2. Enable the module by navigating to **Admin** > **Extend** (`/admin/modules`) in your Drupal admin interface, then enabling "Y PEF Schedules Admin tool"
 
 ## Configuration
 
