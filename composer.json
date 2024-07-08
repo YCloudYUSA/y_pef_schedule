@@ -27,5 +27,8 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "drupal/colorapi": "*",
+        "ynorth-projects/openy_repeat": "*"
+    }
 }
