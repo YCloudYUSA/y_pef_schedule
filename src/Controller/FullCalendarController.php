@@ -248,7 +248,7 @@ class FullCalendarController extends ControllerBase {
 
     $class = $session->get('field_session_class')->entity;
     $activity = $class->get('field_class_activity')->entity;
-    $color = $activity->get('field_activity_color')->value ??  $this->scheduleManager->getDefaultColor();
+    $color = $activity?->get('field_activity_color')->value ??  $this->scheduleManager->getDefaultColor();
     return new JsonResponse(['id' => $session->id(), 'color' => $color]);
   }
 
