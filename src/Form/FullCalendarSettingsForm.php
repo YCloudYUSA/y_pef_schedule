@@ -2,6 +2,7 @@
 
 namespace Drupal\y_pef_schedule\Form;
 
+use Drupal\colorapi\Plugin\DataType\HexColorInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -83,6 +84,13 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Enter the latest time in HH:MM:SS format that you want to be visible in the calendar’s view. This time represents the cutoff point at which the calendar view will stop displaying events for the day.'),
     ];
 
+    $form['default_color'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Default Color'),
+      '#default_value' => $config->get('default_color'),
+      '#description' => $this->t('Enter the default color for activities in the calendar. Enter the color in hexadecimal string format #XXXXXX where X is a hexadecimal character (0-9, a-f).'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -96,6 +104,7 @@ class FullCalendarSettingsForm extends ConfigFormBase {
       ->set('slot_label_interval', $form_state->getValue('slot_label_interval'))
       ->set('min_time', $form_state->getValue('min_time'))
       ->set('max_time', $form_state->getValue('max_time'))
+      ->set('default_color', $form_state->getValue('default_color'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -117,6 +126,10 @@ class FullCalendarSettingsForm extends ConfigFormBase {
 
     if (!preg_match('/^\d{2}:\d{2}$/', $form_state->getValue('slot_label_interval'))) {
       $form_state->setErrorByName('slot_label_interval', $this->t('The Slot Label Interval must be in the format of "HH:MM".'));
+    }
+
+    if (!preg_match(HexColorInterface::HEXADECIMAL_COLOR_REGEX, $form_state->getValue('default_color'))) {
+      $form_state->setErrorByName('default_color', $this->t('%value is not a valid hexadecimal color string. Hexadecimal color strings are in the format #XXXXXX where X is a hexadecimal character (0-9, a-f).', ['%value' => $form_state->getValue('default_color')]));
     }
   }
 
