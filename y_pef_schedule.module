@@ -17,5 +17,9 @@ function y_pef_schedule_theme(): array {
         'branches' => [],
       ],
     ],
+    'block__simple_schedule' => [
+      'base hook' => 'block',
+      'template' => 'block--simple-schedule',
+    ],
   ];
 }

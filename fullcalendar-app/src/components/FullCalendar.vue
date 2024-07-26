@@ -179,6 +179,9 @@ export default {
         // Also update minTime and maxTime
         this.calendarOptions.slotMinTime = window.drupalSettings.fullCalendar.minTime || '04:00:00';
         this.calendarOptions.slotMaxTime = window.drupalSettings.fullCalendar.maxTime || '23:00:00';
+
+        // If calendar is not editable, turn off editable things.
+        this.calendarOptions.editable = window.drupalSettings.fullCalendar.editable;
       }
     });
   },
@@ -278,6 +281,8 @@ export default {
       }
     },
     handleSelect(selectInfo) {
+      if (!this.calendarOptions.editable) return
+
       // 'monday', 'tuesday', ...
       const clickedDay = format(selectInfo.start, 'EEEE').toLowerCase();
 
@@ -409,6 +414,7 @@ export default {
         days: clickInfo.event.extendedProps.days,
         startGlobal: clickInfo.event.extendedProps.startGlobal,
         endGlobal: clickInfo.event.extendedProps.endGlobal,
+        editable: this.calendarOptions.editable
       };
 
       this.openPopup('eventPopover');

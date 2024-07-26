@@ -26,7 +26,7 @@
       </p>
 
     </div>
-    <div class="card-footer text-right">
+    <div class="card-footer text-right" v-if="event.editable">
       <button type="button" class="btn btn-secondary" @click="editEvent">Edit</button>
     </div>
   </div>
