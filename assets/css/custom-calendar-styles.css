@@ -118,6 +118,7 @@ table.fc-col-header.clone {
   position: absolute;
   top: 0;
   right: 0;
+  margin: 15px 0 0;
 }
 /* Fixes the layout of the listDay view in the cloned calendar for a standardized look in the PDF */
 .fc-listDay-view.clone {
