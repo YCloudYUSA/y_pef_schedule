@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-branch-header">
-    <div class="calendar-branch-info" v-if="branchTitle">
+    <div :class="['calendar-branch-info', { 'hide-title': !isTitleShown }]" v-if="branchTitle">
       <h4>{{ 'Branch name' }}</h4>
       <h2>{{ branchTitle }}</h2>
     </div>
@@ -43,12 +43,14 @@ export default {
   data() {
     return {
       isLegendOpen: false,
+      isTitleShown: null,
       branchTitle: null,
     };
   },
   mounted() {
     const eventService = new EventService();
     this.branchTitle = eventService.getBranchTitle();
+    this.isTitleShown = eventService.isTitleShown();
   },
   methods: {
     toggleLegend() {
@@ -190,6 +192,10 @@ export default {
         color: #000;
       }
     }
+  }
+
+  .hide-title {
+    display: none;
   }
 }
 </style>

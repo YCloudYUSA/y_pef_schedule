@@ -141,14 +141,15 @@ class FullCalendarController extends ControllerBase {
     $build['#cache']['tags'][] = 'config:y_pef_schedule.settings';
 
     $build['#attached']['drupalSettings']['fullCalendar'] = [
-      'branch_title' => $options['showTitle'] ? $node_storage->load($branch)?->getTitle() : '',
+      'branch_title' => $node_storage->load($branch)?->getTitle(),
       'branch_id' => $branch,
       'slotDuration' => $fullcalendar_settings->get('slot_duration'),
       'snapDuration' => $fullcalendar_settings->get('snap_duration'),
       'slotLabelInterval' => $fullcalendar_settings->get('slot_label_interval'),
       'minTime' => $fullcalendar_settings->get('min_time'),
       'maxTime' => $fullcalendar_settings->get('max_time'),
-      'editable' => $options['editable']
+      'editable' => $options['editable'],
+      'showTitle' => $options['showTitle'],
     ];
 
     return $build;

@@ -87,6 +87,28 @@ export default class EventService {
   }
 
   /**
+   * Retrieves the 'editable' setting from the window.drupalSettings object.
+   * If the 'editable' setting is not defined within the drupalSettings,
+   * it will return TRUE as the default value.
+   *
+   * @returns {boolean} The 'editable' setting value if available, otherwise TRUE.
+   */
+  isEditable() {
+    return window.drupalSettings.fullCalendar?.editable ?? true;
+  }
+
+  /**
+   * Retrieves the 'showTitle' setting from the window.drupalSettings object.
+   * If the 'showTitle' setting is not defined within the drupalSettings,
+   * it will return TRUE as the default value.
+   *
+   * @returns {boolean} The 'showTitle' setting value if available, otherwise TRUE.
+   */
+  isTitleShown() {
+    return window.drupalSettings.fullCalendar?.showTitle ?? true;
+  }
+
+  /**
    * Attempts to update an event on the server via an API call.
    * It sends the updated event data to the server using a POST request.
    * If the request is successful, the updated data from the server is returned.

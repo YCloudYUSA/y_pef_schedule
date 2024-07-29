@@ -88,6 +88,11 @@
   margin-left: 25px;
   margin-right: 25px;
 }
+
+/* Show the calendar title even if it's hidden for page display */
+#fullcalendar-app.clone .hide-title {
+  display: block;
+}
 /* Ensures that the cloned calendar harness has fixed height to prevent excessive height in the PDF */
 .fc-view-harness.fc-view-harness-active.clone {
   min-height: 1000px;
@@ -128,4 +133,13 @@ table.fc-col-header.clone {
 .fc-header-toolbar .fc-toolbar-chunk.clone,
 .calendar-branch-info h4.clone {
   display: none;
+}
+/* Reset now indicator styles */
+#fullcalendar-app.clone .fc-timegrid-now-indicator-line,
+#fullcalendar-app.clone .fc-timegrid-now-indicator-arrow {
+  display: none;
+}
+#fullcalendar-app.clone .fc-timegrid-col.fc-day-today,
+#fullcalendar-app.clone .fc-highlight {
+  background-color: unset;
 }
