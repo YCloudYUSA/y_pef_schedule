@@ -16,15 +16,19 @@
 
     <button class="legend-toggle-button btn btn-dark" data-mdb-ripple-init @click="toggleLegend">Legend +</button>
     <div :class="['checkbox-container', { active: isLegendOpen }]">
-      <label class="custom-checkbox" v-for="category in categories" :key="category.name">
+      <label
+        v-for="category in categories"
+        :key="category.name"
+        :style="{'border-color': category.color, 'background-color': 'color-mix(in srgb, ' + category.color +', transparent 80%)'}"
+      >
         <input
           type="checkbox"
           :value="category.name"
           :checked="isSelected(category.name)"
           @change="emitCategoryChange(category.name, $event.target.checked)"
           class="custom-checkbox-input"
+          :style="{'accent-color': category.color}"
         />
-        <span class="checkmark" :style="{ 'background-color': category.color, 'border-color': category.color }"></span>
         {{ category.name }}
       </label>
     </div>
@@ -108,59 +112,11 @@ export default {
     &.active {
       display: flex;
     }
-  }
 
-  .custom-checkbox {
-    display: flex;
-    align-items: center;
-    position: relative;
-    padding-left: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    user-select: none;
-    margin-right: 15px;
-
-    input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .checkmark {
-      position: absolute;
-      left: 0;
-      height: 17px;
-      width: 17px;
-      background-color: #eee;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-
-      &:after {
-        content: "";
-        position: absolute;
-        display: none;
-        left: 50%;
-        top: 50%;
-        width: 5px;
-        height: 10px;
-        border: solid black;
-        border-width: 0 2px 2px 0;
-        transform: translate(-50%, -50%) rotate(45deg);
-      }
-    }
-
-    &:hover input ~ .checkmark {
-      background-color: #ccc;
-    }
-
-    input:checked ~ .checkmark {
-      background-color: #2196F3;
-      border: 1px solid #2196F3;
-      &:after {
-        display: block;
-      }
+    label {
+      border: 1px solid;
+      padding: 0 5px;
+      border-radius: var(--wsBorderRadius, 10px);
     }
   }
 

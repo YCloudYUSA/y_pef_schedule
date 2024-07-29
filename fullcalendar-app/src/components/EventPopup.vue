@@ -302,6 +302,7 @@ export default {
     .form-label {
       font-size: 14px;
       margin-bottom: 4px;
+      border-style: none;
     }
   }
 
@@ -331,6 +332,7 @@ export default {
     .form-check-label {
       font-size: 12px;
       padding-left: 5px;
+      border-style: none;
     }
   }
 

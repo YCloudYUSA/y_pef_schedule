@@ -9,9 +9,8 @@
 
     <FullCalendar ref="fullCalendar" :options="calendarOptions">
       <template v-slot:eventContent="arg">
-        <i>{{ arg.event.title }}</i>
-        <br>
-        <b>{{ arg.timeText }}</b>
+        <div class="fc-event-title">{{ arg.event.title }}</div>
+        <div class="fc-event-time">{{ arg.timeText }}</div>
       </template>
     </FullCalendar>
 
@@ -55,6 +54,7 @@ import listPlugin from '@fullcalendar/list'
 import {
   GET_SCHEDULES_CATEGORIES,
 } from '@/config/apiConfig';
+import {invertColor} from "@/utils/colorUtils";
 
 export default {
   name: 'EventsFullCalendar',
@@ -115,7 +115,6 @@ export default {
           hour: 'numeric',
           minute: '2-digit',
           omitZeroMinute: false,
-          hour12: false,
         },
         datesSet: this.handleWeekChange,
         select: this.handleSelect,
@@ -316,6 +315,7 @@ export default {
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
         calendarEvent.setProp('color', updatedEvent.color);
+        calendarEvent.setProp('textColor', invertColor(updatedEvent.color, 'bw'));
         calendarEvent.setExtendedProp('description', updatedEvent.description);
         calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);
         calendarEvent.setExtendedProp('room', updatedEvent.room);
@@ -495,3 +495,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.fc-event {
+  font-size: .875rem;
+  padding: 5px;
+}
+.fc-event-time {
+  opacity: 80%;
+}
+</style>
