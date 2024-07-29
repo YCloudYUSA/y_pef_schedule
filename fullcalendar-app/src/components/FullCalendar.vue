@@ -498,7 +498,7 @@ export default {
 
 <style lang="scss">
 .fc-event {
-  font-size: .875rem;
+  font-size: 14px;
   padding: 5px;
 }
 .fc-event-time {
