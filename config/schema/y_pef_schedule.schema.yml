@@ -1,15 +1,7 @@
-block.settings.lb_simple_schedule:
-  type: block_settings
-  label: 'Simple Schedule block'
-  mapping:
-    example:
-      type: string
-      label: Example
-
 block.settings.ws_simple_schedule:
   type: block_settings
   label: 'Simple Schedule block'
   mapping:
-    example:
-      type: string
-      label: Example
+    location:
+      type: select
+      label: Location

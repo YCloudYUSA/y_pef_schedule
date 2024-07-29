@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: lb_simple_schedule
+label: 'Simple Schedule'
+revision: 0
+description: 'Adds a calendar view of a Branch schedule to a page.'

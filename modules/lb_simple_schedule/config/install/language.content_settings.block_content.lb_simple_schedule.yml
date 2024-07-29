@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.lb_simple_schedule
+id: block_content.lb_simple_schedule
+target_entity_type_id: block_content
+target_bundle: lb_simple_schedule
+default_langcode: site_default
+language_alterable: false
