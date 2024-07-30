@@ -28,3 +28,42 @@ export function invertColor(hex, bw) {
   // pad each with zeros and return
   return "#" + padZero(r) + padZero(g) + padZero(b);
 }
+
+/**
+ * Transforms a 3- or 6- digit hex and a transparency value into RGBA.
+ * Adapted from https://css-tricks.com/converting-color-spaces-in-javascript/#aa-hex-rrggbbaa-to-rgba
+ *
+ * @param h A 3- or 6- digit hex code.
+ * @param a The alpha/transparency value, as a decimal from 0 to 1.
+ * @returns {string} A converted RGBA color code.
+ */
+export function hexToRGBA(h, a = 1) {
+  let r = 0, g = 0, b = 0;
+
+  if (h.length == 4) {
+    r = "0x" + h[1] + h[1];
+    g = "0x" + h[2] + h[2];
+    b = "0x" + h[3] + h[3];
+
+  } else if (h.length == 7) {
+    r = "0x" + h[1] + h[2];
+    g = "0x" + h[3] + h[4];
+    b = "0x" + h[5] + h[6];
+  }
+
+  return "rgba(" + +r + "," + +g + "," + +b + "," + a + ")";
+}
+
+/**
+ * Adds transparency to an RGB color.
+ *
+ * @param rgb A RGB color string.
+ * @param a The alpha/transparency value, as a decimal from 0 to 1.
+ * @returns {string} An RGBA color string.
+ */
+export function rgbToRGBA( rgb, a = 1) {
+  let sep = rgb.indexOf(",") > -1 ? "," : " ";
+  rgb = rgb.substr(4).split(")")[0].split(sep);
+
+  return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")";
+}

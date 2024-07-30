@@ -54,7 +54,7 @@ import listPlugin from '@fullcalendar/list'
 import {
   GET_SCHEDULES_CATEGORIES,
 } from '@/config/apiConfig';
-import {invertColor} from "@/utils/colorUtils";
+import { invertColor, rgbToRGBA } from "@/utils/colorUtils";
 
 export default {
   name: 'EventsFullCalendar',
@@ -314,7 +314,7 @@ export default {
         calendarEvent.setProp('title', updatedEvent.title);
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
-        calendarEvent.setProp('color', updatedEvent.color);
+        calendarEvent.setProp('color', rgbToRGBA(updatedEvent.color, 0.75));
         calendarEvent.setProp('textColor', invertColor(updatedEvent.color, 'bw'));
         calendarEvent.setExtendedProp('description', updatedEvent.description);
         calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);

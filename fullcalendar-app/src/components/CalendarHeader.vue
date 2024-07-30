@@ -19,7 +19,7 @@
       <label
         v-for="category in categories"
         :key="category.name"
-        :style="{'border-color': category.color, 'background-color': 'color-mix(in srgb, ' + category.color +', transparent 80%)'}"
+        :style="{'border-color': category.color, 'background-color': hexToRGBA(category.color, 0.2)}"
       >
         <input
           type="checkbox"
@@ -37,6 +37,7 @@
 
 <script>
 import EventService from '../service/EventService';
+import {hexToRGBA} from "@/utils/colorUtils";
 
 export default {
   name: 'CalendarHeader',
@@ -57,6 +58,7 @@ export default {
     this.isTitleShown = eventService.isTitleShown();
   },
   methods: {
+    hexToRGBA,
     toggleLegend() {
       this.isLegendOpen = !this.isLegendOpen;
     },
