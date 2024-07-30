@@ -15,12 +15,12 @@ It includes a Vue.js component, `fullcalendar-app`, to display and interact with
 
 ```shell
 composer require ycloudyusa/y_pef_schedule
-drush en y_pef_schedule
+drush en y_pef_schedule lb_simple_schedule
 ```
 
 1. Install as you would normally install a contributed Drupal module. For further information, see
    [Installing Drupal Modules](https://www.drupal.org/docs/extending-drupal/installing-drupal-modules).
-2. Enable the module by navigating to **Admin** > **Extend** (`/admin/modules`) in your Drupal admin interface, then enabling "Y PEF Schedules Admin tool"
+2. Enable the module by navigating to **Admin** > **Extend** (`/admin/modules`) in your Drupal admin interface, then enabling "Y PEF Schedules Admin tool" and "LB Simple Schedule".
 
 ## Configuration
 
@@ -35,6 +35,16 @@ After choosing a branch, you can view the calendar. The calendar features includ
 4. Updating existing events.
 5. Downloading the schedule in PDF format.
 6. Filtering results by categories.
+
+### Showing the calendar on a page
+
+Once you have added sessions to a calendar, you can add the calendar block to a Layout Builder page to display on the site. Ensure the "LB Simple Schedule" is enabled first.
+
+1. Edit the Layout of a Layout Builder page (Branch, Landing Page, etc).
+2. Create or find a section, then **Add Block**.
+3. Choose **Add custom/content block** then **Simple Schedule**.
+4. Add a Title and choose a Branch to populate the calendar.
+5. Save the block and the page.
 
 ### Customization
 

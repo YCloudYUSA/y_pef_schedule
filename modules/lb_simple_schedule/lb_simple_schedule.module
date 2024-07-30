@@ -26,6 +26,12 @@ function lb_simple_schedule_preprocess_block__lb_simple_schedule(&$variables) {
   if ($variables['in_preview']) {
     $variables['in_preview_placeholder'] = t('Simple Schedule: To see your changes in this block, please save the layout.');
   }
+
+  // Move the block label up, so it can be displayed.
+  $block = $variables["content"]["#block_content"]?->toArray()['field_block'][0]['plugin_configuration'] ?? NULL;
+  if ($block && $block['label_display'] == 'visible') {
+    $variables['label'] = $block['label'];
+  }
 }
 
 /**
