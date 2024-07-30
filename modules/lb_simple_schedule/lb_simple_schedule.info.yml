@@ -7,4 +7,5 @@ dependencies:
   - drupal:layout_builder
   - y_pef_schedule
   - y_lb
+  - drupal:plugin
 version: 1.0.0
