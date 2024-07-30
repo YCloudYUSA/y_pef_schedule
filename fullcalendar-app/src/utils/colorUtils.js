@@ -1,6 +1,14 @@
 // colorUtils.js
 
-/* Get the inverse of a color, via https://stackoverflow.com/a/35970186/2566038 */
+/**
+ * Get the inverse of a color and optionally convert it to black or white.
+ *   via https://stackoverflow.com/a/35970186/2566038
+ *
+ * @param hex A 3- or 6-digit hex color.
+ * @param bw A truthy value to determine whether to return the inverted color or
+ *   black or white.
+ * @returns {string} A hex color, either the inverse of the input or black/white.
+ */
 export function invertColor(hex, bw) {
   if (hex.indexOf('#') === 0) {
     hex = hex.slice(1);

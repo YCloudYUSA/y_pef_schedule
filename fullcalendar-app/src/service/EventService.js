@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 import { SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig';
-import {invertColor, rgbToRGBA} from "@/utils/colorUtils";
+import {hexToRGBA, invertColor} from "@/utils/colorUtils";
 
 export default class EventService {
 
@@ -46,8 +46,8 @@ export default class EventService {
         end: event.time_end_calendar,
         startGlobal: event.time_start_calendar_global,
         endGlobal: event.time_end_calendar_global,
-        color: rgbToRGBA(event.color, 0.75),
-        textColor: invertColor(event.color, 'bw'),
+        color: hexToRGBA(event.color, 0.75),
+        textColor: invertColor(event.color, true),
         room: event.room,
         instructor: event.instructor,
         description: event.description,

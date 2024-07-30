@@ -315,7 +315,7 @@ export default {
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
         calendarEvent.setProp('color', rgbToRGBA(updatedEvent.color, 0.75));
-        calendarEvent.setProp('textColor', invertColor(updatedEvent.color, 'bw'));
+        calendarEvent.setProp('textColor', invertColor(updatedEvent.color, true));
         calendarEvent.setExtendedProp('description', updatedEvent.description);
         calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);
         calendarEvent.setExtendedProp('room', updatedEvent.room);
