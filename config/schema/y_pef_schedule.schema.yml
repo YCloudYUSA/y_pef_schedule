@@ -1,0 +1,7 @@
+block.settings.ws_simple_schedule:
+  type: block_settings
+  label: 'Simple Schedule block'
+  mapping:
+    location:
+      type: select
+      label: Location

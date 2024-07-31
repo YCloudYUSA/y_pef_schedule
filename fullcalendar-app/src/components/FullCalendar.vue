@@ -9,9 +9,8 @@
 
     <FullCalendar ref="fullCalendar" :options="calendarOptions">
       <template v-slot:eventContent="arg">
-        <i>{{ arg.event.title }}</i>
-        <br>
-        <b>{{ arg.timeText }}</b>
+        <div class="fc-event-title">{{ arg.event.title }}</div>
+        <div class="fc-event-time">{{ arg.timeText }}</div>
       </template>
     </FullCalendar>
 
@@ -55,6 +54,7 @@ import listPlugin from '@fullcalendar/list'
 import {
   GET_SCHEDULES_CATEGORIES,
 } from '@/config/apiConfig';
+import { invertColor, rgbToRGBA } from "@/utils/colorUtils";
 
 export default {
   name: 'EventsFullCalendar',
@@ -115,7 +115,6 @@ export default {
           hour: 'numeric',
           minute: '2-digit',
           omitZeroMinute: false,
-          hour12: false,
         },
         datesSet: this.handleWeekChange,
         select: this.handleSelect,
@@ -179,6 +178,9 @@ export default {
         // Also update minTime and maxTime
         this.calendarOptions.slotMinTime = window.drupalSettings.fullCalendar.minTime || '04:00:00';
         this.calendarOptions.slotMaxTime = window.drupalSettings.fullCalendar.maxTime || '23:00:00';
+
+        // If calendar is not editable, turn off editable things.
+        this.calendarOptions.editable = window.drupalSettings.fullCalendar.editable;
       }
     });
   },
@@ -278,6 +280,8 @@ export default {
       }
     },
     handleSelect(selectInfo) {
+      if (!this.calendarOptions.editable) return
+
       // 'monday', 'tuesday', ...
       const clickedDay = format(selectInfo.start, 'EEEE').toLowerCase();
 
@@ -310,7 +314,8 @@ export default {
         calendarEvent.setProp('title', updatedEvent.title);
         calendarEvent.setStart(updatedEvent.start);
         calendarEvent.setEnd(updatedEvent.end);
-        calendarEvent.setProp('color', updatedEvent.color);
+        calendarEvent.setProp('color', rgbToRGBA(updatedEvent.color, 0.75));
+        calendarEvent.setProp('textColor', invertColor(updatedEvent.color, true));
         calendarEvent.setExtendedProp('description', updatedEvent.description);
         calendarEvent.setExtendedProp('instructor', updatedEvent.instructor);
         calendarEvent.setExtendedProp('room', updatedEvent.room);
@@ -409,6 +414,7 @@ export default {
         days: clickInfo.event.extendedProps.days,
         startGlobal: clickInfo.event.extendedProps.startGlobal,
         endGlobal: clickInfo.event.extendedProps.endGlobal,
+        editable: this.calendarOptions.editable
       };
 
       this.openPopup('eventPopover');
@@ -489,3 +495,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.fc-event {
+  font-size: 14px;
+  padding: 5px;
+}
+.fc-event-time {
+  opacity: 80%;
+}
+</style>

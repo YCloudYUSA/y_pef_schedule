@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.lb_simple_schedule
+    - field.storage.block_content.field_block
+  module:
+    - plugin
+id: block_content.lb_simple_schedule.field_block
+field_name: field_block
+entity_type: block_content
+bundle: lb_simple_schedule
+label: Block
+description: 'Adds a calendar view of a Branch schedule to a page.'
+required: true
+translatable: false
+default_value:
+  -
+    plugin_id: 'ws_simple_schedule'
+    plugin_configuration:
+      id: 'ws_simple_schedule'
+      label: ''
+      label_display: '0'
+      provider: y_pef_schedule
+      views_label: ''
+    plugin_configuration_schema_id: 'block.settings.ws_simple_schedule'
+default_value_callback: ''
+settings: {  }
+field_type: 'plugin:block'

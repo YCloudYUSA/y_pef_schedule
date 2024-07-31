@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @file
+ * Contains lb_simple_schedule module hooks.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function lb_simple_schedule_theme() {
+  return [
+    'block__lb_simple_schedule' => [
+      'base hook' => 'block',
+      'template' => 'block--lb-simple-schedule',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function lb_simple_schedule_preprocess_block__lb_simple_schedule(&$variables) {
+  if ($variables['in_preview']) {
+    $variables['in_preview_placeholder'] = t('Simple Schedule: To see your changes in this block, please save the layout.');
+  }
+
+  // Move the block label up, so it can be displayed.
+  $block = $variables["content"]["#block_content"]?->toArray()['field_block'][0]['plugin_configuration'] ?? NULL;
+  if ($block && $block['label_display'] == 'visible') {
+    $variables['label'] = $block['label'];
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function lb_simple_schedule_form_alter(&$form, FormStateInterface $form_state) {
+  // Block configuration form.
+  if (in_array($form['#form_id'],
+    [
+      'layout_builder_add_block',
+      'layout_builder_update_block',
+    ]
+  )) {
+    /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $form_object */
+    $form_object = $form_state->getFormObject();
+    $component = $form_object->getCurrentComponent();
+    $plugin = $component->getPlugin();
+    $block_id = $plugin->getDerivativeId() ?? $plugin->getBaseId();
+
+    if ($block_id === 'lb_simple_schedule') {
+      // Hide title fields that related to inline block itself.
+      $form['settings']['admin_label']['#access'] = FALSE;
+      $form['settings']['label']['#access'] = FALSE;
+      $form['settings']['label_display']['#access'] = FALSE;
+      if (isset($form['settings']['block_form'])) {
+        $form['settings']['block_form']['#process'][] = '_lb_simple_schedule_inline_block_process';
+      }
+    }
+  }
+}
+
+/**
+ * Custom process callback for inline block elements.
+ *
+ * @param array $element
+ *   Element to process.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ *
+ * @return array
+ *   Processed element.
+ */
+function _lb_simple_schedule_inline_block_process(array $element, FormStateInterface $form_state) {
+  if (isset($element['field_block'])) {
+    $element['field_block']['widget']['#after_build'][] = '_lb_simple_schedule_select_block_field_after_build';
+  }
+  return $element;
+}
+
+/**
+ * Custom '#after_build' callback for field_block.
+ *
+ * @param array $element
+ *   Element to process.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ *
+ * @return array
+ *   Processed element.
+ */
+function _lb_simple_schedule_select_block_field_after_build($element, FormStateInterface $form_state) {
+  if (isset($element[0]['plugin_selector']['container'])) {
+    // Hide the select block field.
+    $element[0]['plugin_selector']['container']['select']['container']['#attributes']['class'][] = 'hidden';
+    // Override a text before edit the Schedule block settings.
+    $element[0]['plugin_selector']['container']['plugin_form']['admin_label']['#title'] = t('Please configure your Simple Schedule block.');
+    unset($element[0]['plugin_selector']['container']['plugin_form']['admin_label']['#plain_text']);
+  }
+  return $element;
+}

@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.lb_simple_schedule
+    - field.field.block_content.lb_simple_schedule.field_block
+  module:
+    - plugin
+id: block_content.lb_simple_schedule.default
+targetEntityType: block_content
+bundle: lb_simple_schedule
+mode: default
+content:
+  field_block:
+    type: plugin_block_built
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true
+  search_api_excerpt: true

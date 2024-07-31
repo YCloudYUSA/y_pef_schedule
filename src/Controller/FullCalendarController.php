@@ -117,7 +117,10 @@ class FullCalendarController extends ControllerBase {
    * @return array
    *    A render array for the calendar view.
    */
-  public function calendarView(string $branch): array {
+  public function calendarView(
+    string $branch,
+    array $options = ['showTitle' => true, 'editable' => true]
+  ): array {
     $fullcalendar_settings = $this->configFactory->get('y_pef_schedule.settings');
     $node_storage = $this->entityTypeManager->getStorage('node');
 
@@ -145,6 +148,8 @@ class FullCalendarController extends ControllerBase {
       'slotLabelInterval' => $fullcalendar_settings->get('slot_label_interval'),
       'minTime' => $fullcalendar_settings->get('min_time'),
       'maxTime' => $fullcalendar_settings->get('max_time'),
+      'editable' => $options['editable'],
+      'showTitle' => $options['showTitle'],
     ];
 
     return $build;

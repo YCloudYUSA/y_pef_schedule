@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { SCHEDULES_ENDPOINT, UPDATE_EVENT_ENDPOINT } from '@/config/apiConfig';
+import {hexToRGBA, invertColor} from "@/utils/colorUtils";
 
 export default class EventService {
 
@@ -45,7 +46,8 @@ export default class EventService {
         end: event.time_end_calendar,
         startGlobal: event.time_start_calendar_global,
         endGlobal: event.time_end_calendar_global,
-        color: event.color,
+        color: hexToRGBA(event.color, 0.75),
+        textColor: invertColor(event.color, true),
         room: event.room,
         instructor: event.instructor,
         description: event.description,
@@ -84,6 +86,28 @@ export default class EventService {
    */
   getBranchId() {
     return window.drupalSettings.fullCalendar?.branch_id || null;
+  }
+
+  /**
+   * Retrieves the 'editable' setting from the window.drupalSettings object.
+   * If the 'editable' setting is not defined within the drupalSettings,
+   * it will return TRUE as the default value.
+   *
+   * @returns {boolean} The 'editable' setting value if available, otherwise TRUE.
+   */
+  isEditable() {
+    return window.drupalSettings.fullCalendar?.editable ?? true;
+  }
+
+  /**
+   * Retrieves the 'showTitle' setting from the window.drupalSettings object.
+   * If the 'showTitle' setting is not defined within the drupalSettings,
+   * it will return TRUE as the default value.
+   *
+   * @returns {boolean} The 'showTitle' setting value if available, otherwise TRUE.
+   */
+  isTitleShown() {
+    return window.drupalSettings.fullCalendar?.showTitle ?? true;
   }
 
   /**
