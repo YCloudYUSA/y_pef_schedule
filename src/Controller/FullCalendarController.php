@@ -274,7 +274,7 @@ class FullCalendarController extends ControllerBase {
   protected function setFieldsSession(EntityInterface &$session, array $data): void {
     $fields = [
       'field_session_room' => 'room',
-      'field_session_instructor' => 'field_session_instructor',
+      'field_session_instructor' => 'instructor',
       'field_session_description' => 'description',
     ];
     foreach ($fields as $key => $dataKey) {

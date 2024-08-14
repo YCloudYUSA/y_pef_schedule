@@ -110,7 +110,7 @@ export default {
         slotMaxTime: '23:00:00',
         contentHeight: 'auto',
         timeZone: 'local',
-        nowIndicator: true,
+        nowIndicator: false,
         slotLabelFormat: {
           hour: 'numeric',
           minute: '2-digit',
@@ -431,6 +431,8 @@ export default {
           // Get the calendar scroll container dimensions and position
           const calendarRect = document.querySelector('.fc-scrollgrid').getBoundingClientRect();
 
+          const calendarFull = document.querySelector('#fullcalendar-app').getBoundingClientRect();
+
           // Determine the optimal horizontal position for the popover
           let left;
           // Check if there's enough space to the right of the event for the popover
@@ -448,19 +450,18 @@ export default {
           // Determine the optimal vertical position for the popover
           let top;
           // Check if there's enough space above the event for the popover
-          if (eventRect.top - popoverRect.height >= calendarRect.top) {
+          if (eventRect.top > popoverRect.height) {
             // Position the popover above the event
-            top = eventRect.top - popoverRect.height;
+            top = eventRect.top - (popoverRect.height ) - calendarFull.top;
           } else if (eventRect.bottom + popoverRect.height <= calendarRect.bottom) {
             // Position the popover below the event if there's not enough space above
-            top = eventRect.bottom;
+            top = eventRect.bottom - calendarFull.top;
           } else {
             // If there's insufficient space above or below, center the popover vertically with respect to the event
             top = eventRect.top + (eventRect.height - popoverRect.height) / 2;
           }
 
           // Adjust position to ensure the popover stays within the calendar view
-          top = Math.max(calendarRect.top, Math.min(top, calendarRect.bottom - popoverRect.height));
           left = Math.max(calendarRect.left, Math.min(left, calendarRect.right - popoverRect.width));
 
           // Apply the calculated styles to the popover for it to appear in the correct position
@@ -503,5 +504,8 @@ export default {
 }
 .fc-event-time {
   opacity: 80%;
+}
+.fc-day-today {
+  background-color: inherit;
 }
 </style>
