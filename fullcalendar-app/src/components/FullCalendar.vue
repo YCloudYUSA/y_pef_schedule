@@ -455,7 +455,6 @@ export default {
             top = eventRect.top - (popoverRect.height ) - calendarFull.top;
           } else if (eventRect.bottom + popoverRect.height <= calendarRect.bottom) {
             // Position the popover below the event if there's not enough space above
-            console.log(eventRect.bottom - calendarFull.top)
             top = eventRect.bottom - calendarFull.top;
           } else {
             // If there's insufficient space above or below, center the popover vertically with respect to the event
@@ -507,6 +506,6 @@ export default {
   opacity: 80%;
 }
 .fc-day-today {
-  background-color: inherit !important;
+  background-color: inherit;
 }
 </style>
