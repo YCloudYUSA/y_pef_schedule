@@ -429,7 +429,12 @@ export default {
           // Get the event element dimensions and position
           const eventRect = clickInfo.el.getBoundingClientRect();
           // Get the calendar scroll container dimensions and position
-          const calendarRect = document.querySelector('.fc-scrollgrid').getBoundingClientRect();
+          let calendarRect = document.querySelector('.fc-scrollgrid');
+          // on mobile
+          if (calendarRect === null) {
+            calendarRect = document.querySelector('.fc-list-table');
+          }
+          calendarRect = calendarRect.getBoundingClientRect();
 
           const calendarFull = document.querySelector('#fullcalendar-app').getBoundingClientRect();
 
@@ -505,7 +510,7 @@ export default {
 .fc-event-time {
   opacity: 80%;
 }
-.fc-day-today {
+.fc-day-today, .fc td.fc-timegrid-col.fc-day-today  {
   background-color: inherit;
 }
 </style>
