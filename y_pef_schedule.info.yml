@@ -1,7 +1,7 @@
 name: Y PEF Schedules Admin tool
 type: module
 description: Additional module to manage your branch schedules.
-core_version_requirement: ^10
+core_version_requirement: ^10 || ^11
 configure: fullcalendar.settings
 package: 'YMCA Website Services'
 version: '1.0'
