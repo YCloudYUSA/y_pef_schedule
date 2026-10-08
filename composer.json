@@ -24,6 +24,6 @@
     "minimum-stability": "dev",
     "require": {
         "drupal/colorapi": "*",
-        "ynorth-projects/openy_repeat": "*"
+        "drupal/openy_repeat": "^3.1 || ^4.0"
     }
 }
