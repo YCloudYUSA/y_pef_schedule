@@ -341,11 +341,11 @@ class RepeatScheduleController extends RepeatController {
     }
 
     // Handle exclusions and limits from the request
-    $exclusions = $request->get('excl');
+    $exclusions = $request->query->get('excl');
     if (!empty($exclusions)) {
       $query->condition('re.category', explode(';', $exclusions), 'NOT IN');
     }
-    $limit = $request->get('limit');
+    $limit = $request->query->get('limit');
     if (!empty($limit)) {
       $query->condition('re.category', explode(';', $limit), 'IN');
     }
