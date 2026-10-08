@@ -1,6 +1,5 @@
 {
     "name": "ycloudyusa/y_pef_schedule",
-    "version": "1.0.0",
     "description": "Additional admin tools to manage Y-USA PEF Sessions",
     "type": "drupal-module",
     "license": "GPL-2.0+",
@@ -25,6 +24,6 @@
     "minimum-stability": "dev",
     "require": {
         "drupal/colorapi": "*",
-        "drupal/openy_repeat": "*"
+        "drupal/openy_repeat": "^3.1 || ^4.0"
     }
 }
